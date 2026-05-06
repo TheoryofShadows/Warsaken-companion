@@ -4,8 +4,8 @@ Mobile-first card browser, deck builder, and AI deck composer for the Warsaken t
 
 ## Features
 
-- **Browse**: searchable, filterable card list (type, set, rarity) with full-art card detail views
-- **Deck**: build, save, rename, import/export, and validate decks against the official rules
+- **Browse**: full-text searchable card list — name, ID, ability text, keywords, flavor — with type/set/rarity filters and full-art detail views
+- **Deck**: build, save, rename, import/export, share-link, and validate against official rules; the **Analysis** tab detects archetype (aggro / control / tempo / ramp / midrange) from keyword density + cost curve and ships a Predicted Matchups panel scoring counter coverage against every leader's recipes; the **Practice** tab is a goldfish mode with mulligan + turn-by-turn hypergeometric draw probabilities for any card in your arsenal
 - **AI**: three builders -- Recipe (curated official decks), Novel (visible reasoning, theme + leader-driven composition), and Counter-Meta (adversarial -- pick the leader you expect to face and the AI builds a deck designed to counter them, with a threat-coverage matrix showing which opposing keywords your deck shuts down)
 - **Synergy**: keyword-graph explorer with combo scoring, counters, and per-card synergy breakdowns
 - **Rules**: searchable rulebook excerpts (keywords, deck rules, etc.)

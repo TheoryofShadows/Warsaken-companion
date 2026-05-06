@@ -771,6 +771,200 @@ return { issues, valid: issues.length === 0, total, byType, entries };
 }
 
 // ============================================================================
+// DECK ANALYSIS V2 — archetype detection, synergy density, predicted matchups,
+// hypergeometric draw probabilities, mulligan simulator. Mirrors counter-meta
+// scoring logic but applies it to the user's own deck.
+// ============================================================================
+
+// log(C(n,k)) — logarithmic binomial coefficient, avoids overflow on big decks
+function logChoose(n, k) {
+if (k < 0 || k > n) return -Infinity;
+if (k === 0 || k === n) return 0;
+let r = 0;
+const lim = Math.min(k, n - k);
+for (let i = 1; i <= lim; i++) r += Math.log(n - i + 1) - Math.log(i);
+return r;
+}
+
+// Hypergeometric: P(exactly k successes in n draws from population N with K successes)
+function hypergeomP(N, K, n, k) {
+if (k < 0 || k > K || k > n || (n - k) > (N - K)) return 0;
+return Math.exp(logChoose(K, k) + logChoose(N - K, n - k) - logChoose(N, n));
+}
+
+// P(at least k successes in n draws)
+function hypergeomAtLeast(N, K, n, k) {
+let p = 0;
+const limit = Math.min(K, n);
+for (let i = k; i <= limit; i++) p += hypergeomP(N, K, n, i);
+return p;
+}
+
+// P(see at least k copies of cardId after drawing `draws` cards from the arsenal).
+// Arsenal = deck minus leader and territories (those start in play).
+function cardDrawProbability(deck, cardId, draws, k = 1) {
+let arsenalSize = 0;
+for (const [id, n] of Object.entries(deck)) {
+const c = getCard(id);
+if (!c || c.type === 'Leader' || c.type === 'Territory') continue;
+arsenalSize += n;
+}
+const targetCount = deck[cardId] || 0;
+if (arsenalSize === 0 || targetCount === 0) return 0;
+return hypergeomAtLeast(arsenalSize, targetCount, Math.min(draws, arsenalSize), k);
+}
+
+// Shuffle the arsenal (Fisher-Yates) and return the first `handSize` cards.
+function simulateOpeningHand(deck, handSize = 8) {
+const arsenal = [];
+for (const [id, n] of Object.entries(deck)) {
+const c = getCard(id);
+if (!c || c.type === 'Leader' || c.type === 'Territory') continue;
+for (let i = 0; i < n; i++) arsenal.push(id);
+}
+for (let i = arsenal.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[arsenal[i], arsenal[j]] = [arsenal[j], arsenal[i]];
+}
+return arsenal.slice(0, Math.min(handSize, arsenal.length)).map(id => getCard(id));
+}
+
+// Analyze any deck — archetype, themes, synergies, weaknesses, matchups.
+// Reverses the Counter-Meta engine: instead of building a deck against a target,
+// reads what the deck IS and predicts what it shuts down + struggles with.
+// Important: deckStats uses base-only cardById, so we re-resolve via getCard()
+// to access enriched fields (keywords, cost, subtype) that drive the analysis.
+function analyzeDeck(deck) {
+const { entries, total, byType } = deckStats(deck);
+if (total === 0) return null;
+
+// Re-resolve every entry through getCard() so we get base + enriched merged.
+const richEntries = entries
+.map(e => ({ card: getCard(e.card.id), n: e.n }))
+.filter(e => e.card);
+
+const leaderEntry = richEntries.find(e => e.card.type === 'Leader');
+const leader = leaderEntry?.card || null;
+
+let enrichedCount = 0;
+const keywordCounts = {};
+for (const e of richEntries) {
+if (e.card.hasFullData) enrichedCount += e.n;
+for (const kw of (e.card.keywords || [])) {
+keywordCounts[kw] = (keywordCounts[kw] || 0) + e.n;
+}
+}
+const enrichmentPct = total > 0 ? enrichedCount / total : 0;
+
+const forceTypes = { Ground: 0, Air: 0, Navy: 0 };
+for (const e of richEntries) {
+if (e.card.type !== 'Force') continue;
+const sub = (e.card.subtype || '').toUpperCase();
+if (sub.startsWith('AIR')) forceTypes.Air += e.n;
+else if (sub.startsWith('NAVY') || sub.startsWith('SUB')) forceTypes.Navy += e.n;
+else if (sub.startsWith('SOLDIER') || sub.startsWith('ARMY') || sub.startsWith('DRONE') || sub.startsWith('MECH') || sub.startsWith('TANK')) forceTypes.Ground += e.n;
+}
+
+const costCurve = {};
+for (const e of richEntries) {
+if (typeof e.card.cost === 'number') costCurve[e.card.cost] = (costCurve[e.card.cost] || 0) + e.n;
+}
+
+const subtypeCounts = {};
+for (const e of richEntries) {
+const subs = (e.card.subtype || '').split(/[:,]/).map(s => s.trim()).filter(Boolean);
+for (const s of subs) subtypeCounts[s] = (subtypeCounts[s] || 0) + e.n;
+}
+const themes = Object.entries(subtypeCounts)
+.filter(([, n]) => n >= 4)
+.sort((a, b) => b[1] - a[1])
+.slice(0, 5)
+.map(([t]) => t);
+
+const fastCards = (costCurve[0] || 0) + (costCurve[1] || 0);
+const slowCards = Object.entries(costCurve).filter(([c]) => parseInt(c) >= 3).reduce((s, [, n]) => s + n, 0);
+const drawKws = ['DRAW A CARD', 'DRAW (X) CARDS', 'DRAW A CARD PER TURN', 'DRAW (X) CARDS PER TURN', 'INSIGHT', 'RECON', 'PILFER', 'EXPERIMENT'];
+const removalKws = ['LOCKOUT', 'STUN', 'DISABLED', 'HIJACK', 'PICK-OFF', 'DEAD MAN', 'SUBVERT', 'CULL', 'EXECUTE', 'DEMO', 'RUIN'];
+const damageKws = ['BLITZ', 'BEAM', 'CRACK SHOT', 'FINEST', 'HYPERSONIC STRIKE', 'TACTICAL STRIKE', 'NUCLEAR DETONATION', 'AIR RAID'];
+const draws = drawKws.reduce((s, k) => s + (keywordCounts[k] || 0), 0);
+const removal = removalKws.reduce((s, k) => s + (keywordCounts[k] || 0), 0);
+const damage = damageKws.reduce((s, k) => s + (keywordCounts[k] || 0), 0);
+
+const archetypeScores = {
+aggro:   (fastCards >= 25 ? 3 : fastCards >= 18 ? 1 : 0) + (damage >= 6 ? 2 : 0),
+control: (removal >= 8 ? 3 : removal >= 4 ? 1 : 0) + (slowCards >= 18 ? 1 : 0),
+tempo:   (draws >= 6 ? 3 : draws >= 3 ? 1 : 0) + (fastCards >= 20 ? 1 : 0),
+ramp:    (slowCards >= 20 ? 3 : slowCards >= 12 ? 1 : 0),
+};
+const archTop = Object.entries(archetypeScores).sort((a, b) => b[1] - a[1])[0];
+const archetype = archTop && archTop[1] >= 2 ? archTop[0] : 'midrange';
+
+// Active synergies: which documented SYN edges fire because both endpoints are in the deck
+const activeSynergies = [];
+const seenPairs = new Set();
+for (const edge of SYN.edges) {
+if (edge[2] === 'counters') continue;
+const a = keywordCounts[edge[0]] || 0;
+const b = keywordCounts[edge[1]] || 0;
+if (a === 0 || b === 0) continue;
+const key = [edge[0], edge[1]].sort().join('|');
+if (seenPairs.has(key)) continue;
+seenPairs.add(key);
+activeSynergies.push({ pair: [edge[0], edge[1]], aCount: a, bCount: b, count: Math.min(a, b), relation: edge[2] });
+}
+activeSynergies.sort((a, b) => b.count - a.count);
+
+const weaknesses = [];
+if (!keywordCounts['ANTI-AIR']) weaknesses.push('No ANTI-AIR — vulnerable to air forces and bombers.');
+if (!keywordCounts['ANTI-GROUND']) weaknesses.push('No ANTI-GROUND — soldier/army swarms hit hard.');
+if (!keywordCounts['STEALTH'] && !keywordCounts['EVADE'] && !keywordCounts['COVERT']) {
+weaknesses.push('No evasion (STEALTH/EVADE/COVERT) — every force is blockable.');
+}
+if (fastCards < 22) weaknesses.push(`Light early game — only ${fastCards} cost-0/1 cards.`);
+if (removal < 4) weaknesses.push('Thin removal — few answers to enemy threats.');
+if (draws < 3) weaknesses.push('Thin card draw — may run out of options.');
+const totalForces = byType['Force'] || 0;
+if (totalForces < 22) weaknesses.push(`Only ${totalForces} forces — may struggle to hold the war zone.`);
+if (enrichmentPct < 0.3) weaknesses.push(`Only ${Math.round(enrichmentPct * 100)}% of cards have full keyword data; analysis is conservative.`);
+
+// Predicted matchups: for each enriched OPPOSING leader with recipes, score how
+// well this deck counters their predicted threats. Score = countered keywords / total.
+const matchups = [];
+const oppLeaders = CARDS.filter(c => c.type === 'Leader' && c.id !== leader?.id);
+for (const oppLeader of oppLeaders) {
+const recipes = getRecipesForLeader(oppLeader.id);
+if (recipes.length === 0) continue;
+const oppKws = {};
+for (const recipe of recipes) {
+const resolved = resolveRecipe(recipe);
+for (const [id, n] of Object.entries(resolved.deck)) {
+const c = getCard(id);
+if (!c?.keywords) continue;
+for (const kw of c.keywords) oppKws[kw] = (oppKws[kw] || 0) + n;
+}
+}
+const total = Object.keys(oppKws).length;
+if (total === 0) continue;
+let countered = 0;
+for (const theirKw of Object.keys(oppKws)) {
+const countersForThis = SYN.edges.filter(e => e[2] === 'counters' && e[1] === theirKw);
+const haveCounter = countersForThis.some(edge => (keywordCounts[edge[0]] || 0) > 0);
+if (haveCounter) countered++;
+}
+matchups.push({ leader: getCard(oppLeader.id), score: countered / total, countered, total });
+}
+matchups.sort((a, b) => b.score - a.score);
+
+return {
+leader, total, byType, themes, archetype, archetypeScores,
+keywordCounts, forceTypes, costCurve,
+activeSynergies, weaknesses, matchups,
+enrichmentPct,
+fastCards, slowCards, draws, removal, damage,
+};
+}
+
+// ============================================================================
 // MAIN APP
 // ============================================================================
 export default function WarsakenCompanion() {
@@ -1163,8 +1357,20 @@ return CARDS.filter(c => {
 if (filterType !== 'All' && c.type !== filterType) return false;
 if (filterSet !== 'All' && c.setid !== filterSet) return false;
 if (filterRarity !== 'All' && c.rarity !== filterRarity) return false;
-if (q && !`${c.id} ${c.name} ${c.type} ${c.rarity}`.toLowerCase().includes(q)) return false;
-return true;
+if (!q) return true;
+// Base haystack: id, name, type, rarity
+let hay = `${c.id} ${c.name} ${c.type} ${c.rarity}`;
+// Enriched haystack: subtype, keywords, ability names + text, flavor
+const e = ENRICHED_BY_ID[c.id];
+if (e) {
+hay += ' ' + (e.subtype || '');
+if (Array.isArray(e.keywords)) hay += ' ' + e.keywords.join(' ');
+if (Array.isArray(e.abilities)) {
+for (const a of e.abilities) hay += ' ' + (a.name || '') + ' ' + (a.text || '');
+}
+if (e.flavor) hay += ' ' + e.flavor;
+}
+return hay.toLowerCase().includes(q);
 });
 }, [query, filterType, filterSet, filterRarity]);
 
@@ -1198,7 +1404,7 @@ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
 </div>
 <div className="relative">
 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-500" />
-<input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by name, ID, type..."
+<input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, ID, ability text, keywords, flavor..."
 className="w-full pl-10 pr-10 py-2.5 text-sm text-white placeholder:text-stone-600 focus:outline-none transition rounded-lg"
 style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)' }} />
 {query && (<button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-white"><X className="h-4 w-4" /></button>)}
@@ -1852,9 +2058,10 @@ return (
 <span>T: <span className="text-stone-100">{validation.byType['Territory']||0}</span></span>
 <span>A: <span className="text-stone-100">{validation.total - (validation.byType['Leader']||0) - (validation.byType['Territory']||0)}</span></span>
 </div>
-<div className="flex gap-1 mt-2">
+<div className="flex gap-1 mt-2 flex-wrap">
 <button onClick={() => setSection('list')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'list' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>LIST</button>
 <button onClick={() => setSection('analysis')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'analysis' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>ANALYSIS</button>
+<button onClick={() => setSection('practice')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'practice' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>PRACTICE</button>
 <button onClick={() => setSection('issues')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'issues' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>
 ISSUES {validation.issues.length > 0 && <span className="ml-1 text-rose-400">{validation.issues.length}</span>}
 </button>
@@ -1936,7 +2143,9 @@ ISSUES {validation.issues.length > 0 && <span className="ml-1 text-rose-400">{va
     ) : section === 'list' ? (
       <DeckList entries={sortedEntries} onInc={inc} onDec={dec} onRemove={removeAll} />
     ) : section === 'analysis' ? (
-      <DeckAnalysis validation={validation} />
+      <DeckAnalysis deck={deck} validation={validation} />
+    ) : section === 'practice' ? (
+      <PracticeSection deck={deck} validation={validation} />
     ) : (
       <DeckIssues issues={validation.issues} valid={validation.valid} />
     )}
@@ -1989,69 +2198,383 @@ return (
 );
 }
 
-function DeckAnalysis({ validation }) {
+function DeckAnalysis({ deck, validation }) {
+const teach = useTeach();
+const analysis = useMemo(() => analyzeDeck(deck), [deck]);
 const types = Object.entries(validation.byType).sort((a, b) => b[1] - a[1]);
 const max = Math.max(...types.map(t => t[1]), 1);
-// Set distribution
 const bySet = {};
-for (const e of validation.entries) {
-bySet[e.card.setid] = (bySet[e.card.setid] || 0) + e.n;
-}
-// Rarity
+for (const e of validation.entries) bySet[e.card.setid] = (bySet[e.card.setid] || 0) + e.n;
 const byRarity = {};
-for (const e of validation.entries) {
-byRarity[e.card.rarity] = (byRarity[e.card.rarity] || 0) + e.n;
-}
+for (const e of validation.entries) byRarity[e.card.rarity] = (byRarity[e.card.rarity] || 0) + e.n;
+
+if (!analysis) return null;
+
+const ARCH_META = {
+aggro:    { color: '#fb7185', label: 'AGGRO',    desc: 'Pressure-focused — fast cards and damage keywords push leader compromise quickly.' },
+control:  { color: '#7dd3fc', label: 'CONTROL',  desc: 'Removal-heavy — locks/stuns/eliminates threats while grinding to a long-game win.' },
+tempo:    { color: '#c084fc', label: 'TEMPO',    desc: 'Card-advantage — draw engines + cheap plays compound into a dominant position.' },
+ramp:     { color: '#86efac', label: 'RAMP',     desc: 'Build-up — heavier curve banking on big resource production for late-game payoffs.' },
+midrange: { color: '#fde047', label: 'MIDRANGE', desc: 'Balanced — no single dominant axis; flexible and reactive.' },
+};
+const archMeta = ARCH_META[analysis.archetype];
+
 return (
 <div className="space-y-4">
-<div className="border border-stone-800 bg-stone-900/40 p-3">
-<div className="text-yellow-300 text-xs font-bold tracking-wider mb-3">TYPE DISTRIBUTION</div>
-<div className="space-y-2">
-{types.map(([t, n]) => {
-const meta = TYPE_META[t] || { color: '#9ca3af' };
+{/* Archetype banner */}
+<div className="rounded-xl p-4 relative overflow-hidden" style={{
+background: `linear-gradient(135deg, ${archMeta.color}22, rgba(20,20,24,0.85))`,
+border: `1px solid ${archMeta.color}55`,
+boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
+}}>
+<div className="text-[10px] tracking-[0.2em] mb-1" style={{ color: archMeta.color }}>// DECK ARCHETYPE</div>
+<div className="text-2xl font-bold mb-1.5" style={{ color: archMeta.color }}>{archMeta.label}</div>
+<div className="text-xs text-stone-300 leading-relaxed mb-3">{archMeta.desc}</div>
+{analysis.themes.length > 0 && (
+<div className="flex flex-wrap gap-1.5">
+{analysis.themes.map(t => (
+<span key={t} className="text-[10px] tracking-wider px-2 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', color: '#e7e5e4' }}>{t.toUpperCase()}</span>
+))}
+</div>
+)}
+<div className="grid grid-cols-4 gap-1.5 mt-3">
+{Object.entries(analysis.archetypeScores).map(([k, v]) => (
+<div key={k} className="text-center rounded p-1.5" style={{ background: 'rgba(0,0,0,0.4)', border: k === analysis.archetype ? `1px solid ${archMeta.color}` : '1px solid rgba(255,255,255,0.05)' }}>
+<div className="text-[8px] tracking-wider text-stone-400">{k.toUpperCase()}</div>
+<div className="text-sm font-bold" style={{ color: k === analysis.archetype ? archMeta.color : '#a8a29e' }}>{v}</div>
+</div>
+))}
+</div>
+</div>
+
+  {/* Synergy density */}
+  {Object.keys(analysis.keywordCounts).length > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center gap-2 mb-2">
+        <Network className="h-3.5 w-3.5 text-yellow-300" />
+        <div className="text-xs font-bold text-yellow-200 tracking-wider">SYNERGY DENSITY · TAP TO LEARN</div>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {Object.entries(analysis.keywordCounts).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([kw, n]) => (
+          <button key={kw} onClick={() => teach.showKeyword(kw)} className="text-[11px] px-2 py-1 rounded-md transition" style={{
+            background: 'rgba(253,224,71,0.1)', border: '1px solid rgba(253,224,71,0.3)', color: '#fde047',
+          }}>
+            {kw} <span className="text-yellow-400/70 font-bold ml-1">×{n}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* Active synergies (documented edges that fire in this deck) */}
+  {analysis.activeSynergies.length > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(192,132,252,0.2)' }}>
+      <div className="flex items-center gap-2 mb-3">
+        <GitBranch className="h-3.5 w-3.5 text-purple-300" />
+        <div className="text-xs font-bold text-purple-200 tracking-wider">ACTIVE SYNERGIES</div>
+      </div>
+      <div className="space-y-1.5">
+        {analysis.activeSynergies.slice(0, 6).map((s, i) => (
+          <div key={i} className="flex items-center justify-between text-[11px] gap-2">
+            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+              <button onClick={() => teach.showKeyword(s.pair[0])} className="text-purple-200 hover:text-white truncate transition">{s.pair[0]}</button>
+              <span className="text-stone-600 flex-shrink-0">×</span>
+              <button onClick={() => teach.showKeyword(s.pair[1])} className="text-purple-200 hover:text-white truncate transition">{s.pair[1]}</button>
+            </div>
+            <span className="text-purple-300 font-mono font-bold flex-shrink-0">{s.aCount}/{s.bCount}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* Cost curve */}
+  {Object.keys(analysis.costCurve).length > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center gap-2 mb-3">
+        <TrendingUp className="h-3.5 w-3.5 text-yellow-300" />
+        <div className="text-xs font-bold text-yellow-200 tracking-wider">COST CURVE</div>
+      </div>
+      <div className="space-y-2">
+        {[0, 1, 2, 3, 4].map(c => {
+          const n = analysis.costCurve[c] || 0;
+          const cMax = Math.max(...Object.values(analysis.costCurve), 1);
+          return (
+            <div key={c}>
+              <div className="flex justify-between text-[11px] mb-1">
+                <span className="text-stone-300 font-mono">↺ {c}{c === 4 ? '+' : ''}</span>
+                <span className="text-stone-400">{n} cards</span>
+              </div>
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                <div className="h-full rounded-full transition-all" style={{ width: `${(n / cMax) * 100}%`, background: 'linear-gradient(90deg, #fde047, #fb923c)', boxShadow: '0 0 8px rgba(253,224,71,0.4)' }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+  {/* Predicted matchups (based on counter coverage of opposing recipes) */}
+  {analysis.matchups.length > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(251,113,133,0.2)' }}>
+      <div className="flex items-center gap-2 mb-3">
+        <Crosshair className="h-3.5 w-3.5 text-rose-300" />
+        <div className="text-xs font-bold text-rose-200 tracking-wider">PREDICTED MATCHUPS · COUNTER COVERAGE</div>
+      </div>
+      <div className="space-y-1.5">
+        {analysis.matchups.slice(0, 8).map(m => {
+          const pct = Math.round(m.score * 100);
+          const color = m.score >= 0.5 ? '#86efac' : m.score >= 0.25 ? '#fde047' : '#fb7185';
+          return (
+            <div key={m.leader.id} className="text-[11px]">
+              <div className="flex items-center justify-between mb-1 gap-2">
+                <span className="text-stone-200 truncate flex-1">vs {m.leader.name}</span>
+                <span className="font-mono font-bold flex-shrink-0" style={{ color }}>{pct}%</span>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="text-[10px] text-stone-500 mt-3 leading-relaxed">
+        Score = % of opposing leader's predicted threat keywords your deck has at least one explicit counter for. Based on their official recipes.
+      </div>
+    </div>
+  )}
+
+  {/* Force-type composition */}
+  {(analysis.forceTypes.Ground + analysis.forceTypes.Air + analysis.forceTypes.Navy) > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center gap-2 mb-3">
+        <Shield className="h-3.5 w-3.5 text-yellow-300" />
+        <div className="text-xs font-bold text-yellow-200 tracking-wider">FORCE COMPOSITION</div>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {['Ground', 'Air', 'Navy'].map(t => (
+          <div key={t} className="text-center rounded-lg p-2" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className="text-[9px] tracking-[0.2em] text-stone-400">{t.toUpperCase()}</div>
+            <div className="text-base font-bold mt-1 text-stone-100">{analysis.forceTypes[t]}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* Type / set / rarity (preserved from old analysis) */}
+  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="text-xs font-bold text-yellow-200 tracking-wider mb-3">TYPE DISTRIBUTION</div>
+    <div className="space-y-2">
+      {types.map(([t, n]) => {
+        const meta = TYPE_META[t] || { color: '#9ca3af' };
+        return (
+          <div key={t}>
+            <div className="flex justify-between text-xs mb-0.5">
+              <span className="text-stone-300">{t}</span>
+              <span className="text-stone-500">{n}</span>
+            </div>
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+              <div className="h-full rounded-full" style={{ width: `${(n / max) * 100}%`, backgroundColor: meta.color }} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  {/* Weaknesses */}
+  {analysis.weaknesses.length > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.3)' }}>
+      <div className="flex items-center gap-2 mb-2">
+        <AlertTriangle className="h-3.5 w-3.5 text-rose-300" />
+        <div className="text-xs font-bold text-rose-200 tracking-wider">DETECTED WEAKNESSES</div>
+      </div>
+      <div className="space-y-1.5 text-xs text-stone-300">
+        {analysis.weaknesses.map((w, i) => (<div key={i} className="leading-relaxed">{w}</div>))}
+      </div>
+    </div>
+  )}
+</div>
+
+);
+}
+
+// Practice / opening-hand simulator with hypergeometric draw probability calc.
+function PracticeSection({ deck, validation }) {
+const teach = useTeach();
+const [hand, setHand] = useState([]);
+const [drawnCount, setDrawnCount] = useState(0);
+const [seed, setSeed] = useState(0); // bumps to force a new shuffle on mulligan
+const [probCardId, setProbCardId] = useState(null);
+
+const arsenalSize = useMemo(() => {
+let s = 0;
+for (const [id, n] of Object.entries(deck)) {
+const c = getCard(id);
+if (!c || c.type === 'Leader' || c.type === 'Territory') continue;
+s += n;
+}
+return s;
+}, [deck]);
+
+const arsenalCards = useMemo(() => {
+const list = [];
+for (const [id, n] of Object.entries(deck)) {
+const c = getCard(id);
+if (!c || c.type === 'Leader' || c.type === 'Territory') continue;
+list.push({ card: c, n });
+}
+return list.sort((a, b) => b.n - a.n || a.card.name.localeCompare(b.card.name));
+}, [deck]);
+
+// Draw a fresh opening hand (resets state)
+const drawOpeningHand = () => {
+setHand(simulateOpeningHand(deck, 8));
+setDrawnCount(8);
+setSeed(s => s + 1);
+};
+
+// Mulligan: re-draw an opening hand from a fresh shuffle
+const mulligan = () => drawOpeningHand();
+
+// Draw N more cards (turn simulation)
+const drawNext = () => {
+const drawn = simulateOpeningHand(deck, drawnCount + 1);
+setHand(drawn);
+setDrawnCount(drawnCount + 1);
+};
+
+const reset = () => { setHand([]); setDrawnCount(0); };
+
+const probCard = probCardId ? getCard(probCardId) : null;
+const probCopies = probCardId ? (deck[probCardId] || 0) : 0;
+const TURNS = [1, 2, 3, 4, 5, 6, 7, 8, 10];
+const probCurve = probCardId ? TURNS.map(t => ({
+turn: t, p: cardDrawProbability(deck, probCardId, 8 + (t - 1), 1),
+})) : [];
+
+if (validation.total < 10) {
 return (
-<div key={t}>
-<div className="flex justify-between text-xs mb-0.5">
-<span className="text-stone-300">{t}</span>
-<span className="text-stone-500">{n}</span>
-</div>
-<div className="h-1.5 bg-stone-900 overflow-hidden">
-<div className="h-full transition-all" style={{ width: `${(n / max) * 100}%`, backgroundColor: meta.color }} />
-</div>
+<div className="rounded-xl p-6 text-center" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+<Activity className="h-10 w-10 mx-auto text-stone-700 mb-3" />
+<p className="text-sm text-stone-400">Practice mode needs at least 10 cards in deck.</p>
+<p className="text-xs text-stone-600 mt-1 tracking-wider">CURRENTLY {validation.total}</p>
 </div>
 );
-})}
+}
+
+return (
+<div className="space-y-4">
+{/* Header / arsenal stats */}
+<div className="rounded-xl p-4 relative overflow-hidden" style={{
+background: 'linear-gradient(135deg, rgba(192,132,252,0.08), rgba(20,20,24,0.7))',
+border: '1px solid rgba(192,132,252,0.25)',
+}}>
+<div className="text-[10px] tracking-[0.2em] text-purple-300/80 mb-1">// PRACTICE · GOLDFISH MODE</div>
+<div className="text-sm text-stone-200 leading-relaxed">
+Shuffle your arsenal and draw an opening hand. Mulligan to re-draw. Tap any card in the arsenal below to see <span className="text-purple-300 font-bold">hypergeometric draw probabilities</span> turn-by-turn.
+</div>
+<div className="grid grid-cols-3 gap-2 mt-3">
+<StatBox label="ARSENAL" value={arsenalSize} color="#c084fc" />
+<StatBox label="DRAWN" value={drawnCount} color="#fde047" />
+<StatBox label="LEFT" value={Math.max(0, arsenalSize - drawnCount)} color="#86efac" />
 </div>
 </div>
-<div className="border border-stone-800 bg-stone-900/40 p-3">
-<div className="text-yellow-300 text-xs font-bold tracking-wider mb-3">SET DISTRIBUTION</div>
-<div className="space-y-1">
-{Object.entries(bySet).sort().map(([s, n]) => (
-<div key={s} className="flex justify-between text-xs">
-<span className="text-stone-300">{s} · {SET_NAMES[s] || ''}</span>
-<span className="text-stone-500">{n}</span>
+
+  {/* Hand area */}
+  {hand.length === 0 ? (
+    <button onClick={drawOpeningHand} className="w-full py-6 rounded-xl text-purple-100 hover:text-white transition flex items-center justify-center gap-2 font-bold tracking-wider" style={{
+      background: 'linear-gradient(135deg, rgba(192,132,252,0.2), rgba(192,132,252,0.05))',
+      border: '1px solid rgba(192,132,252,0.5)',
+      boxShadow: '0 8px 32px rgba(192,132,252,0.15), inset 0 1px 0 rgba(255,255,255,0.08)',
+    }}>
+      <Sparkles className="h-4 w-4" /> DRAW OPENING HAND (8)
+    </button>
+  ) : (
+    <div className="space-y-3">
+      <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(192,132,252,0.2)' }}>
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-xs font-bold text-purple-200 tracking-wider">YOUR HAND ({hand.length})</div>
+          <div className="text-[10px] text-stone-500 tracking-wider">SHUFFLE #{seed}</div>
+        </div>
+        <div className="space-y-1">
+          {hand.map((c, i) => {
+            const meta = TYPE_META[c.type] || { color: '#9ca3af' };
+            return (
+              <button key={`${c.id}-${i}`} onClick={() => teach.showCard(c.id)} className="w-full flex items-center gap-2 text-xs py-1.5 px-2 rounded hover:bg-white/5 transition text-left">
+                <span className="text-[9px] font-bold tracking-wider w-12 flex-shrink-0" style={{ color: meta.color }}>{c.type.slice(0, 4).toUpperCase()}</span>
+                <span className="text-stone-100 flex-1 truncate">{c.name}</span>
+                {typeof c.cost === 'number' && <span className="text-[10px] text-stone-500 font-mono flex-shrink-0">↺{c.cost}</span>}
+                {c.hasFullData && <span className="text-[8px] text-emerald-400 tracking-wider flex-shrink-0">DATA</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        <button onClick={mulligan} className="py-2.5 rounded-lg text-xs font-bold tracking-wider text-purple-200 hover:text-white transition" style={{
+          background: 'rgba(192,132,252,0.1)', border: '1px solid rgba(192,132,252,0.4)',
+        }}>MULLIGAN</button>
+        <button onClick={drawNext} disabled={drawnCount >= arsenalSize} className="py-2.5 rounded-lg text-xs font-bold tracking-wider text-yellow-200 hover:text-white transition disabled:opacity-30" style={{
+          background: 'rgba(253,224,71,0.1)', border: '1px solid rgba(253,224,71,0.4)',
+        }}>DRAW +1</button>
+        <button onClick={reset} className="py-2.5 rounded-lg text-xs font-bold tracking-wider text-stone-400 hover:text-stone-200 transition" style={{
+          background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)',
+        }}>RESET</button>
+      </div>
+    </div>
+  )}
+
+  {/* Probability calculator */}
+  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(125,211,252,0.2)' }}>
+    <div className="flex items-center gap-2 mb-3">
+      <Activity className="h-3.5 w-3.5 text-sky-300" />
+      <div className="text-xs font-bold text-sky-200 tracking-wider">DRAW PROBABILITY · HYPERGEOMETRIC</div>
+    </div>
+    <div className="text-[10px] text-stone-500 mb-3 leading-relaxed">
+      P(see ≥1 copy of selected card by turn N), accounting for opening hand of 8 + 1 draw per turn from a {arsenalSize}-card arsenal.
+    </div>
+    <div className="text-[10px] tracking-[0.2em] text-stone-400 mb-2">// PICK A CARD</div>
+    <div className="max-h-44 overflow-y-auto space-y-1 mb-3 pr-1">
+      {arsenalCards.slice(0, 30).map(({ card: c, n }) => {
+        const meta = TYPE_META[c.type] || { color: '#9ca3af' };
+        const active = probCardId === c.id;
+        return (
+          <button key={c.id} onClick={() => setProbCardId(c.id)} className={`w-full flex items-center gap-2 text-xs py-1.5 px-2 rounded transition text-left ${active ? 'bg-sky-500/15' : 'hover:bg-white/5'}`} style={active ? { border: '1px solid rgba(125,211,252,0.5)' } : { border: '1px solid transparent' }}>
+            <span className="text-[9px] font-bold tracking-wider w-12 flex-shrink-0" style={{ color: meta.color }}>{c.type.slice(0, 4).toUpperCase()}</span>
+            <span className="text-stone-100 flex-1 truncate">{c.name}</span>
+            <span className="text-yellow-300 font-mono font-bold w-7 text-right">×{n}</span>
+          </button>
+        );
+      })}
+    </div>
+    {probCard && (
+      <div className="rounded-lg p-3 mt-2" style={{ background: 'rgba(125,211,252,0.05)', border: '1px solid rgba(125,211,252,0.2)' }}>
+        <div className="text-[10px] tracking-wider text-sky-300/80 mb-1">// {probCard.name} · {probCopies}-of</div>
+        <div className="space-y-1.5">
+          {probCurve.map(p => {
+            const pct = Math.round(p.p * 100);
+            const color = p.p >= 0.75 ? '#86efac' : p.p >= 0.5 ? '#fde047' : p.p >= 0.25 ? '#fb923c' : '#fb7185';
+            return (
+              <div key={p.turn}>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-stone-400 font-mono">turn {p.turn}</span>
+                  <span style={{ color }} className="font-mono font-bold">{pct}%</span>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    )}
+  </div>
 </div>
-))}
-</div>
-</div>
-<div className="border border-stone-800 bg-stone-900/40 p-3">
-<div className="text-yellow-300 text-xs font-bold tracking-wider mb-3">RARITY MIX</div>
-<div className="space-y-1">
-{Object.entries(byRarity).map(([r, n]) => (
-<div key={r} className="flex justify-between text-xs">
-<span style={{ color: (RARITY_META[r] || {}).color || '#9ca3af' }}>{r}</span>
-<span className="text-stone-500">{n}</span>
-</div>
-))}
-</div>
-</div>
-<div className="border border-stone-800 bg-stone-900/40 p-3">
-<div className="text-[10px] tracking-wider text-stone-500 mb-1">// COMING NEXT</div>
-<div className="text-xs text-stone-400 leading-relaxed">
-Cost curve, keyword synergies, and resource production analysis require per-card ability data -- pending data ingestion from card images.
-</div>
-</div>
-</div>
+
 );
 }
 
