@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect, createContext, useContext, useCallback } from 'react';
-import { Search, X, Filter, Bookmark, BookmarkCheck, ChevronRight, Crown, MapPin, Skull, Star, Shield, Cloud, Eye, Heart, Building2, Wrench, Wind, ExternalLink, ImageOff, BookOpen, Layers, AlertTriangle, CheckCircle2, Plus, Minus, Trash2, Library, Sparkles, Brain, Zap as ZapIcon, Activity, ArrowRight, Loader2, Network, GitBranch, Flame, Target, Info, Lightbulb, TrendingUp, Award, Compass, Swords, Share2, Gamepad2, Command } from 'lucide-react';
-import PlayTab from './PlayTab.jsx';
+import { Search, X, Filter, Bookmark, BookmarkCheck, ChevronRight, Crown, MapPin, Skull, Star, Shield, Cloud, Eye, Heart, Building2, Wrench, Wind, ExternalLink, ImageOff, BookOpen, Layers, AlertTriangle, CheckCircle2, Plus, Minus, Trash2, Library, Sparkles, Brain, Zap as ZapIcon, Activity, ArrowRight, Loader2, Network, GitBranch, Flame, Target, Info, Lightbulb, TrendingUp, Award, Compass, Swords, Share2, Command, Crosshair, ShieldAlert } from 'lucide-react';
 import CommandPalette from './CommandPalette.jsx';
 import ShareBanner from './ShareBanner.jsx';
 import { readShareFromHash, clearShareHash, buildShareUrl } from './share.js';
@@ -342,6 +341,330 @@ totalCards: Object.values(deck).reduce((s,n)=>s+n,0),
 }
 
 // ============================================================================
+// AI ENGINE V3 — COUNTER-META BUILDER
+// Adversarial deckbuilder. Predicts a target leader's likely build from their
+// recipes and a Novel composition, then scores every candidate card with a
+// blend of own-synergy (your leader) and counter-value against the target's
+// threat profile. Uses three counter vectors:
+//   (A) Explicit `counters` edges from SYN (asymmetric)
+//   (B) Type-triangle: ANTI-AIR / ANTI-GROUND / ANTI-NAVAL vs target's Force mix
+//   (C) Light archetype heuristic from the target leader's ability text
+// Returns full reasoning + a threat-coverage matrix for the result view.
+// ============================================================================
+
+// Predict the target leader's likely deck composition by aggregating their
+// official recipes (weight 1.0 per copy) plus a Novel composition (weight 0.5).
+function predictThreatProfile(targetLeaderId) {
+const target = getCard(targetLeaderId);
+if (!target) return null;
+
+const cardWeights = {};
+
+// Recipes (canonical, full weight)
+for (const recipe of getRecipesForLeader(targetLeaderId)) {
+const resolved = resolveRecipe(recipe);
+for (const [id, n] of Object.entries(resolved.deck)) {
+cardWeights[id] = (cardWeights[id] || 0) + n;
+}
+}
+
+// Novel composition (inferred, half weight). Only works for enriched leaders.
+const novel = composeNovelDeck(targetLeaderId);
+if (novel?.deck) {
+for (const [id, n] of Object.entries(novel.deck)) {
+cardWeights[id] = (cardWeights[id] || 0) + n * 0.5;
+}
+}
+
+// Aggregate keywords / force types / resource mix from the predicted cards
+const keywords = {};
+const forceTypes = { Ground: 0, Air: 0, Navy: 0 };
+const resourceMix = { G: 0, F: 0, P: 0, Fu: 0, M: 0 };
+let enrichedWeight = 0;
+let totalWeight = 0;
+
+for (const [id, weight] of Object.entries(cardWeights)) {
+const c = getCard(id);
+if (!c) continue;
+totalWeight += weight;
+if (c.hasFullData) enrichedWeight += weight;
+
+for (const kw of (c.keywords || [])) {
+keywords[kw] = (keywords[kw] || 0) + weight;
+}
+
+if (c.type === 'Force') {
+const sub = (c.subtype || '').toUpperCase();
+if (sub.startsWith('AIR')) forceTypes.Air += weight;
+else if (sub.startsWith('NAVY') || sub.startsWith('SUB')) forceTypes.Navy += weight;
+else if (sub.startsWith('SOLDIER') || sub.startsWith('ARMY') || sub.startsWith('DRONE') || sub.startsWith('MECH') || sub.startsWith('TANK')) forceTypes.Ground += weight;
+}
+
+if (c.type === 'Territory' && Array.isArray(c.produces)) {
+for (const r of c.produces) {
+if (resourceMix[r] !== undefined) resourceMix[r] += weight;
+}
+}
+}
+
+const confidence = totalWeight > 0 ? enrichedWeight / totalWeight : 0;
+
+// Archetype heuristic from leader ability text — only fires if leader is enriched
+const leaderText = (target.abilities || []).map(a => `${a.name||''} ${a.text||''}`).join(' ').toLowerCase();
+let archetype = 'unknown';
+if (target.hasFullData && leaderText.length > 0) {
+const intelHits = (leaderText.match(/intel/g) || []).length;
+const drawHits = (leaderText.match(/draw|cycle|search/g) || []).length;
+const damageHits = (leaderText.match(/damage|eliminate|destroy|nuclear|wmd|detonation|strike/g) || []).length;
+const resourceHits = (leaderText.match(/per turn|produce|generic|fuel|power|equipment|food/g) || []).length;
+const scores = {
+control: intelHits * 2 + drawHits,
+ramp: resourceHits * 2,
+aggro: damageHits * 2,
+tempo: drawHits + intelHits,
+};
+const top = Object.entries(scores).sort((a,b) => b[1]-a[1])[0];
+if (top && top[1] >= 2) archetype = top[0];
+}
+
+return { target, cards: cardWeights, keywords, forceTypes, resourceMix, archetype, leaderText, confidence };
+}
+
+// Score a candidate card's counter value against a threat profile.
+// Returns an explainable score with per-bucket reasoning (edge / triangle / strategic).
+const STRATEGIC_COUNTERS = {
+control: ['LOCKOUT', 'STUN', 'SUBVERT', 'CYCLE', 'DISABLED'],
+ramp:    ['TAX', 'SHUT OFF', 'WORK STOP', 'SUSPEND', 'MELTDOWN', 'RUIN', 'NUCLEAR DETONATION'],
+aggro:   ['GUARD', 'PROTECT', 'HEAL', 'RESTORE', 'RESTORATION', 'ARMORED'],
+tempo:   ['LOCKOUT', 'SUBVERT', 'PILFER', 'STUN'],
+};
+
+function scoreCardCounterValue(card, threat) {
+if (!card || !threat) return { score: 0, reasons: [] };
+const cardKws = card.keywords || [];
+if (cardKws.length === 0) return { score: 0, reasons: [] };
+
+const reasons = [];
+let score = 0;
+
+// (A) Explicit edge counters — asymmetric, so only count edges where OUR keyword
+// is the counterer (edge[0]) and THEIR keyword is the countered (edge[1]).
+for (const ourKw of cardKws) {
+for (const edge of getEdgesFor(ourKw, 'counters')) {
+if (edge[0] !== ourKw) continue;
+const theirKw = edge[1];
+const theirWeight = threat.keywords[theirKw] || 0;
+if (theirWeight > 0) {
+const pts = Math.min(8 * (theirWeight / 4), 24);
+score += pts;
+reasons.push({ pts: Math.round(pts), type: 'edge', ourKw, theirKw, why: `${ourKw} counters ${theirKw} (${theirWeight.toFixed(1)} weight in target)` });
+}
+}
+}
+
+// (B) Type-triangle counters — Force-type denial via ANTI-X keywords.
+const triangle = [
+{ kw: 'ANTI-AIR',     type: 'Air',    threshold: 4 },
+{ kw: 'ANTI-GROUND',  type: 'Ground', threshold: 4 },
+{ kw: 'ANTI-NAVAL',   type: 'Navy',   threshold: 4 },
+];
+for (const t of triangle) {
+if (cardKws.includes(t.kw) && threat.forceTypes[t.type] >= t.threshold) {
+const pts = Math.min(5 + threat.forceTypes[t.type] / 6, 12);
+score += pts;
+reasons.push({ pts: Math.round(pts), type: 'triangle', ourKw: t.kw, theirType: t.type, why: `${t.kw} vs ${threat.forceTypes[t.type].toFixed(0)} ${t.type.toLowerCase()} forces in target` });
+}
+}
+
+// (C) Strategic / archetype counters — small bonus only when archetype is confident.
+if (threat.archetype !== 'unknown') {
+const counterKws = STRATEGIC_COUNTERS[threat.archetype] || [];
+const seen = new Set();
+for (const ck of counterKws) {
+if (cardKws.includes(ck) && !seen.has(ck)) {
+seen.add(ck);
+score += 4;
+reasons.push({ pts: 4, type: 'strategic', ourKw: ck, archetype: threat.archetype, why: `${ck} disrupts ${threat.archetype} archetype` });
+}
+}
+}
+
+return { score, reasons };
+}
+
+// Build a 65-card deck for `yourLeaderId` optimized to counter `targetLeaderId`.
+// Score blend: 0.35 × own-synergy + 0.65 × counter-value (counter-biased but
+// keeps decks coherent rather than producing a pile of disjoint counters).
+function composeCounterDeck(yourLeaderId, targetLeaderId) {
+const yourLeader = getCard(yourLeaderId);
+if (!yourLeader || !yourLeader.hasFullData) return null;
+
+const threat = predictThreatProfile(targetLeaderId);
+if (!threat) return null;
+
+// Auto-detect themes for OUR leader (mirrors composeNovelDeck logic)
+const themes = new Set();
+const yourText = (yourLeader.abilities || []).map(a => `${a.name||''} ${a.text||''}`).join(' ').toLowerCase();
+if (yourText.includes('drone')) themes.add('Drone');
+if (yourText.includes('soldier')) themes.add('Soldier');
+if (yourText.includes('wmd') || yourText.includes('nuclear') || yourText.includes('detonation')) themes.add('WMD');
+if (yourText.includes('tank') || yourText.includes('mech')) themes.add('Tank');
+if (yourText.includes('territory') || yourText.includes('repair') || yourText.includes('restoration')) themes.add('Territory');
+if (yourText.includes('intel') || yourText.includes('unveil')) themes.add('Intel');
+if (yourText.includes('infect')) themes.add('Infected');
+if (themes.size === 0) themes.add('Force');
+
+const ctx = { leader: yourLeader, themes, keywordsInDeck: {}, subtypesInDeck: {} };
+const trace = [];
+
+// Score every enriched non-leader candidate with combined own + counter score.
+const scored = ENRICHED
+.filter(e => e.id !== yourLeaderId && e.id !== targetLeaderId)
+.map(e => {
+const c = getCard(e.id);
+const ownEval = scoreCardInContext(c, ctx);
+const counterEval = scoreCardCounterValue(c, threat);
+const combined = 0.35 * ownEval.score + 0.65 * counterEval.score;
+return {
+card: c,
+score: combined,
+ownScore: ownEval.score,
+counterScore: counterEval.score,
+ownReasons: ownEval.reasons,
+counterReasons: counterEval.reasons,
+};
+})
+.filter(s => s.card)
+.sort((a, b) => b.score - a.score);
+
+// Pick 4 unique territories first
+const tCandidates = scored.filter(s => s.card.type === 'Territory');
+const territories = tCandidates.slice(0, 4);
+
+// Pick 60 arsenal cards (max 4 copies each)
+const arsenalCandidates = scored.filter(s => s.card.type !== 'Territory' && s.card.type !== 'Leader');
+const arsenal = {};
+let arsenalCount = 0;
+for (const ac of arsenalCandidates) {
+if (arsenalCount >= 60) break;
+const remaining = 60 - arsenalCount;
+const copies = Math.min(4, remaining);
+arsenal[ac.card.id] = copies;
+arsenalCount += copies;
+trace.push({
+card: ac.card, copies,
+score: Math.round(ac.score),
+ownScore: Math.round(ac.ownScore),
+counterScore: Math.round(ac.counterScore),
+ownReasons: ac.ownReasons,
+counterReasons: ac.counterReasons,
+});
+for (const k of (ac.card.keywords || [])) {
+ctx.keywordsInDeck[k] = (ctx.keywordsInDeck[k] || 0) + copies;
+}
+}
+
+const deck = { [yourLeaderId]: 1 };
+for (const t of territories) {
+deck[t.card.id] = 1;
+trace.unshift({
+card: t.card, copies: 1,
+score: Math.round(t.score),
+ownScore: Math.round(t.ownScore),
+counterScore: Math.round(t.counterScore),
+ownReasons: t.ownReasons,
+counterReasons: t.counterReasons,
+});
+}
+for (const [id, n] of Object.entries(arsenal)) deck[id] = n;
+
+// Aggregate our deck's keyword counts and cost curve
+const keywordCounts = {};
+for (const [id, n] of Object.entries(deck)) {
+const c = getCard(id);
+if (!c?.keywords) continue;
+for (const k of c.keywords) keywordCounts[k] = (keywordCounts[k] || 0) + n;
+}
+const costCurve = {};
+for (const [id, n] of Object.entries(deck)) {
+const c = getCard(id);
+if (typeof c?.cost === 'number') costCurve[c.cost] = (costCurve[c.cost] || 0) + n;
+}
+
+// Threat coverage matrix — for each enemy keyword, which of our cards counter it?
+const threatCoverage = {};
+for (const [theirKw, theirWeight] of Object.entries(threat.keywords)) {
+if (theirWeight <= 0) continue;
+const counterCards = [];
+for (const [id, n] of Object.entries(deck)) {
+const c = getCard(id);
+if (!c?.keywords) continue;
+for (const ourKw of c.keywords) {
+const edge = SYN.edges.find(e => e[0] === ourKw && e[1] === theirKw && e[2] === 'counters');
+if (edge) {
+counterCards.push({ id, name: c.name, copies: n, ourKw });
+break;
+}
+}
+}
+threatCoverage[theirKw] = {
+weight: theirWeight,
+counterCards,
+counterCount: counterCards.reduce((s,cc) => s + cc.copies, 0),
+};
+}
+
+// Type-triangle coverage (separate from keyword coverage)
+const triangleCoverage = {};
+for (const [type, threatCount] of Object.entries(threat.forceTypes)) {
+if (threatCount <= 0) continue;
+const kw = type === 'Air' ? 'ANTI-AIR' : type === 'Ground' ? 'ANTI-GROUND' : 'ANTI-NAVAL';
+triangleCoverage[type] = {
+threatCount, counterKw: kw, counterCount: keywordCounts[kw] || 0,
+};
+}
+
+const totalThreats = Object.keys(threatCoverage).length;
+const coveredThreats = Object.values(threatCoverage).filter(t => t.counterCount > 0).length;
+const coveragePct = totalThreats > 0 ? coveredThreats / totalThreats : 0;
+
+const weaknesses = [];
+const uncovered = Object.entries(threatCoverage)
+.filter(([_, t]) => t.counterCount === 0)
+.sort((a, b) => b[1].weight - a[1].weight);
+if (uncovered.length > 0) {
+const top = uncovered.slice(0, 3).map(u => u[0]).join(', ');
+weaknesses.push(`${uncovered.length} target keyword${uncovered.length === 1 ? '' : 's'} uncountered: ${top}${uncovered.length > 3 ? '…' : ''}.`);
+}
+if (threat.confidence < 0.3) {
+weaknesses.push(`Low target confidence -- only ${Math.round(threat.confidence*100)}% of the predicted threat deck has full keyword data, so counters are conservative.`);
+}
+if ((costCurve[0] || 0) + (costCurve[1] || 0) < 25) {
+weaknesses.push('Light early game -- few cost-0/1 cards.');
+}
+const totalForces = Object.entries(deck).filter(([id]) => getCard(id)?.type === 'Force').reduce((s,[id,n])=>s+n,0);
+if (totalForces < 20) weaknesses.push(`Only ${totalForces} forces -- may struggle to hold the war zone.`);
+
+return {
+leader: yourLeader,
+target: threat.target,
+threat,
+themes: Array.from(themes),
+deck,
+trace,
+keywordCounts,
+costCurve,
+threatCoverage,
+triangleCoverage,
+coveragePct,
+coveredThreats,
+totalThreats,
+weaknesses,
+totalCards: Object.values(deck).reduce((s,n) => s+n, 0),
+};
+}
+
+// ============================================================================
 // VISUAL CONFIG
 // ============================================================================
 const SET_NAMES = {
@@ -633,11 +956,6 @@ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4)
     />}
     {tab === 'ai' && <AITab setDeck={setActiveDeckCards} setTab={setTab} createDeck={createDeck} />}
     {tab === 'syn' && <SynergyTab />}
-    {tab === 'play' && <PlayTab
-      getCard={getCard}
-      leaders={ENRICHED.filter(e => { const c = cardById[e.id]; return c && c.type === 'Leader'; }).map(e => ({ ...cardById[e.id], ...e }))}
-      openCardDetail={showCard}
-    />}
   </div>
 
   {/* TAB BAR — glass surface with active glow */}
@@ -646,13 +964,12 @@ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4)
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
   }}>
-    <div className="grid grid-cols-6">
+    <div className="grid grid-cols-5">
       <TabButton active={tab==='browse'} onClick={() => setTab('browse')} icon={Library} label="CARDS" sub={`${CARDS.length}`} />
       <TabButton active={tab==='rules'} onClick={() => setTab('rules')} icon={BookOpen} label="RULES" sub={`v${RULES.version}`} />
       <TabButton active={tab==='deck'} onClick={() => setTab('deck')} icon={Layers} label="DECK" sub={`${totalInActive}/65`} />
       <TabButton active={tab==='ai'} onClick={() => setTab('ai')} icon={Sparkles} label="AI" sub="builder" />
       <TabButton active={tab==='syn'} onClick={() => setTab('syn')} icon={Network} label="SYN" sub="combos" />
-      <TabButton active={tab==='play'} onClick={() => setTab('play')} icon={Gamepad2} label="PLAY" sub="live HUD" />
     </div>
   </nav>
 
@@ -1844,7 +2161,7 @@ return { score, breakdown };
 // AI BUILDER TAB v2 — Recipe-First
 // ============================================================================
 function AITab({ setDeck, setTab, createDeck }) {
-const [mode, setMode] = useState('recipe'); // ‘recipe’ | ‘novel’
+const [mode, setMode] = useState('recipe'); // 'recipe' | 'novel' | 'counter'
 const recipeLeaders = useMemo(() => getRecipeLeaders(), []);
 const enrichedLeaders = useMemo(() => ENRICHED
 .filter(e => CARDS.find(c => c.id === e.id && c.type === 'Leader'))
@@ -1862,6 +2179,21 @@ const [resolved, setResolved] = useState(null);
 const [novelLeaderId, setNovelLeaderId] = useState(null);
 const [novelResult, setNovelResult] = useState(null);
 const [novelBuilding, setNovelBuilding] = useState(false);
+
+// Counter-meta mode state
+const [counterTargetId, setCounterTargetId] = useState(null);
+const [counterYourId, setCounterYourId] = useState(null);
+const [counterResult, setCounterResult] = useState(null);
+const [counterBuilding, setCounterBuilding] = useState(false);
+
+// Leaders eligible to be YOUR leader: must be enriched (so own-synergy scoring works).
+// Leaders eligible as TARGET: any leader with at least one recipe OR enrichment.
+const recipeLeaderIds = useMemo(() => new Set(recipeLeaders.map(l => l.id)), [recipeLeaders]);
+const counterTargetCandidates = useMemo(() => {
+const ids = new Set([...enrichedLeaders.map(l => l.id), ...recipeLeaderIds]);
+return Array.from(ids).map(id => getCard(id)).filter(Boolean)
+.sort((a, b) => (a.id || '').localeCompare(b.id || ''));
+}, [enrichedLeaders, recipeLeaderIds]);
 
 const recipesForLeader = selectedLeaderId ? getRecipesForLeader(selectedLeaderId) : [];
 
@@ -1885,6 +2217,17 @@ setNovelBuilding(false);
 }, 800);
 };
 
+const buildCounter = (yourId, targetId) => {
+setCounterYourId(yourId);
+setCounterTargetId(targetId);
+setCounterBuilding(true);
+setCounterResult(null);
+setTimeout(() => {
+setCounterResult(composeCounterDeck(yourId, targetId));
+setCounterBuilding(false);
+}, 900);
+};
+
 const loadIntoDeckBuilder = () => {
 if (!resolved) return;
 const title = selectedRecipe?.title || 'AI Deck';
@@ -1906,12 +2249,24 @@ setTab('deck');
 }
 };
 
+const loadCounterIntoDeck = () => {
+if (!counterResult) return;
+const title = `${counterResult.leader.name} vs ${counterResult.target.name}`;
+if (createDeck) {
+createDeck(title, counterResult.deck);
+setTab('deck');
+}
+};
+
 const reset = () => {
 setSelectedLeaderId(null);
 setSelectedRecipe(null);
 setResolved(null);
 setNovelLeaderId(null);
 setNovelResult(null);
+setCounterTargetId(null);
+setCounterYourId(null);
+setCounterResult(null);
 };
 
 const backToRecipes = () => {
@@ -1922,6 +2277,12 @@ setResolved(null);
 const backToNovel = () => {
 setNovelLeaderId(null);
 setNovelResult(null);
+};
+
+const backToCounter = () => {
+setCounterTargetId(null);
+setCounterYourId(null);
+setCounterResult(null);
 };
 
 return (
@@ -1941,14 +2302,18 @@ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
 <span className="text-[10px] text-stone-500 tracking-wider">{ENRICHED.length} ENRICHED · {RECIPES.length} RECIPES</span>
 </div>
 {/* Mode toggle */}
-<div className="grid grid-cols-2 gap-1 p-1 rounded-lg" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)' }}>
+<div className="grid grid-cols-3 gap-1 p-1 rounded-lg" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)' }}>
 <button onClick={() => { setMode('recipe'); reset(); }} className={`text-[11px] py-2 rounded-md tracking-wider font-bold transition flex items-center justify-center gap-1.5 ${mode === 'recipe' ? 'text-yellow-200' : 'text-stone-400 hover:text-stone-200'}`}
 style={mode === 'recipe' ? { background: 'linear-gradient(180deg, rgba(253,224,71,0.15), rgba(253,224,71,0.05))', boxShadow: '0 0 16px rgba(253,224,71,0.15), inset 0 1px 0 rgba(255,255,255,0.05)' } : {}}>
-<Award className="h-3.5 w-3.5" /> OFFICIAL RECIPES
+<Award className="h-3.5 w-3.5" /> RECIPE
 </button>
 <button onClick={() => { setMode('novel'); reset(); }} className={`text-[11px] py-2 rounded-md tracking-wider font-bold transition flex items-center justify-center gap-1.5 ${mode === 'novel' ? 'text-yellow-200' : 'text-stone-400 hover:text-stone-200'}`}
 style={mode === 'novel' ? { background: 'linear-gradient(180deg, rgba(253,224,71,0.15), rgba(253,224,71,0.05))', boxShadow: '0 0 16px rgba(253,224,71,0.15), inset 0 1px 0 rgba(255,255,255,0.05)' } : {}}>
-<Brain className="h-3.5 w-3.5" /> NOVEL BUILD
+<Brain className="h-3.5 w-3.5" /> NOVEL
+</button>
+<button onClick={() => { setMode('counter'); reset(); }} className={`text-[11px] py-2 rounded-md tracking-wider font-bold transition flex items-center justify-center gap-1.5 ${mode === 'counter' ? 'text-rose-200' : 'text-stone-400 hover:text-stone-200'}`}
+style={mode === 'counter' ? { background: 'linear-gradient(180deg, rgba(251,113,133,0.18), rgba(251,113,133,0.05))', boxShadow: '0 0 16px rgba(251,113,133,0.2), inset 0 1px 0 rgba(255,255,255,0.05)' } : {}}>
+<Crosshair className="h-3.5 w-3.5" /> COUNTER
 </button>
 </div>
 </div>
@@ -1971,6 +2336,16 @@ style={mode === 'novel' ? { background: 'linear-gradient(180deg, rgba(253,224,71
       buildNovel={buildNovel}
       loadNovelIntoDeck={loadNovelIntoDeck}
       backToNovel={backToNovel}
+    />)}
+    {mode === 'counter' && (<CounterMode
+      enrichedLeaders={enrichedLeaders}
+      targetCandidates={counterTargetCandidates}
+      counterTargetId={counterTargetId} setCounterTargetId={setCounterTargetId}
+      counterYourId={counterYourId}
+      counterResult={counterResult} counterBuilding={counterBuilding}
+      buildCounter={buildCounter}
+      loadCounterIntoDeck={loadCounterIntoDeck}
+      backToCounter={backToCounter}
     />)}
   </main>
 </>
@@ -2396,6 +2771,393 @@ border: '1px solid rgba(255,255,255,0.05)',
 </div>
 ))}
 </div>
+</button>
+</div>
+);
+}
+
+// ============================================================================
+// COUNTER-META MODE — adversarial deckbuilder UI. Pick the leader you face,
+// pick your own leader, get a deck designed to counter them with a visible
+// threat-coverage matrix.
+// ============================================================================
+function CounterMode({ enrichedLeaders, targetCandidates, counterTargetId, setCounterTargetId, counterYourId, counterResult, counterBuilding, buildCounter, loadCounterIntoDeck, backToCounter }) {
+const teach = useTeach();
+
+if (counterBuilding) {
+return (
+<div className="py-20 text-center">
+<div className="relative inline-block">
+<Crosshair className="h-12 w-12 mx-auto text-rose-400 mb-3" style={{ filter: 'drop-shadow(0 0 16px rgba(251,113,133,0.5))' }} />
+<div className="absolute inset-0 animate-ping opacity-30">
+<Crosshair className="h-12 w-12 mx-auto text-rose-400" />
+</div>
+</div>
+<div className="text-sm text-rose-200 tracking-wider mt-4 font-bold">PROFILING TARGET · BUILDING COUNTERS...</div>
+<div className="text-xs text-stone-400 mt-2 max-w-xs mx-auto leading-relaxed">
+Predicting target's likely deck · aggregating threat keywords · scoring every card with own-synergy + counter-value · mapping coverage matrix
+</div>
+</div>
+);
+}
+
+if (counterResult) {
+return <CounterResultView result={counterResult} onBack={backToCounter} onLoad={loadCounterIntoDeck} teach={teach} />;
+}
+
+// Step 1 — pick TARGET (who you face)
+if (!counterTargetId) {
+return (
+<div className="space-y-4">
+<div className="rounded-xl p-4 relative overflow-hidden" style={{
+background: 'linear-gradient(135deg, rgba(251,113,133,0.08), rgba(20,20,24,0.6))',
+border: '1px solid rgba(251,113,133,0.25)',
+}}>
+<div className="flex items-start gap-2">
+<ShieldAlert className="h-4 w-4 text-rose-300 flex-shrink-0 mt-0.5" />
+<div className="text-xs text-stone-200 leading-relaxed">
+<span className="font-bold text-rose-200">COUNTER-META BUILDER. </span>
+Pick the leader you expect to face. The AI predicts their likely build from official recipes plus a Novel composition, scores every card by own-synergy + counter-value against the predicted threat profile, and produces a <span className="text-rose-300 font-bold">threat-coverage matrix</span> showing which of their keywords your deck shuts down.
+</div>
+</div>
+</div>
+
+  <div className="text-[10px] tracking-[0.2em] text-rose-300/80">// STEP 1 · WHO YOU FACE ({targetCandidates.length})</div>
+  <div className="space-y-2">
+    {targetCandidates.map(l => {
+      const recipeCount = getRecipesForLeader(l.id).length;
+      return (
+        <button key={l.id} onClick={() => setCounterTargetId(l.id)}
+          className="w-full text-left rounded-xl overflow-hidden transition-all group relative"
+          style={{
+            background: 'linear-gradient(135deg, rgba(251,113,133,0.06), rgba(20,20,24,0.6) 40%)',
+            border: '1px solid rgba(255,255,255,0.06)',
+          }}>
+          <div className="p-3 flex items-start gap-3">
+            <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(251,113,133,0.12)', boxShadow: '0 0 16px rgba(251,113,133,0.2)' }}>
+              <Crown className="h-5 w-5 text-rose-300" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm text-white font-medium truncate">{l.name}</div>
+              <div className="text-[10px] text-stone-500 tracking-wider mt-0.5">
+                {l.id} · {recipeCount} RECIPE{recipeCount === 1 ? '' : 'S'} · {l.hasFullData ? 'ENRICHED' : 'BASE'}
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-stone-500 group-hover:text-rose-300 group-hover:translate-x-0.5 transition mt-1.5" />
+          </div>
+        </button>
+      );
+    })}
+  </div>
+</div>
+
+);
+}
+
+// Step 2 — pick YOUR leader
+const target = getCard(counterTargetId);
+return (
+<div className="space-y-4">
+<button onClick={() => setCounterTargetId(null)} className="text-xs text-stone-400 hover:text-rose-300 flex items-center gap-1 transition">← CHANGE TARGET</button>
+
+  <div className="rounded-xl p-3" style={{ background: 'linear-gradient(135deg, rgba(251,113,133,0.1), rgba(20,20,24,0.7))', border: '1px solid rgba(251,113,133,0.3)' }}>
+    <div className="text-[10px] tracking-[0.2em] text-rose-300/80 mb-1">// TARGET</div>
+    <div className="flex items-center gap-2">
+      <Crown className="h-4 w-4 text-rose-300" />
+      <div className="text-sm text-white font-medium truncate">{target?.name || counterTargetId}</div>
+    </div>
+  </div>
+
+  <div className="text-[10px] tracking-[0.2em] text-yellow-300/80">// STEP 2 · WHO YOU PLAY ({enrichedLeaders.length})</div>
+  <div className="space-y-2">
+    {enrichedLeaders.map(l => (
+      <button key={l.id} onClick={() => buildCounter(l.id, counterTargetId)}
+        disabled={l.id === counterTargetId}
+        className="w-full text-left rounded-xl overflow-hidden transition-all group relative disabled:opacity-30 disabled:cursor-not-allowed"
+        style={{
+          background: 'linear-gradient(135deg, rgba(253,224,71,0.06), rgba(20,20,24,0.6) 40%)',
+          border: '1px solid rgba(255,255,255,0.06)',
+        }}>
+        <div className="p-3 flex items-start gap-3">
+          <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(253,224,71,0.12)', boxShadow: '0 0 16px rgba(253,224,71,0.2)' }}>
+            <Crown className="h-5 w-5 text-yellow-300" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm text-white font-medium truncate">{l.name}</div>
+            <div className="text-[10px] text-stone-500 tracking-wider mt-0.5">
+              {l.id} · MORALE {l.morale} · HP {l.hp}{l.id === counterTargetId ? ' · (TARGET)' : ''}
+            </div>
+          </div>
+          <ArrowRight className="h-4 w-4 text-stone-500 group-hover:text-yellow-300 group-hover:translate-x-0.5 transition mt-1.5" />
+        </div>
+      </button>
+    ))}
+  </div>
+</div>
+
+);
+}
+
+function CounterResultView({ result, onBack, onLoad, teach }) {
+const [showAllPicks, setShowAllPicks] = useState(false);
+const visiblePicks = showAllPicks ? result.trace : result.trace.slice(0, 8);
+const sortedThreats = Object.entries(result.threatCoverage).sort((a, b) => b[1].weight - a[1].weight);
+const maxWeight = Math.max(1, ...sortedThreats.map(t => t[1].weight));
+
+return (
+<div className="space-y-4">
+<button onClick={onBack} className="text-xs text-stone-400 hover:text-rose-300 flex items-center gap-1 transition">
+← BUILD ANOTHER
+</button>
+
+  {/* Side-by-side header: target (red) vs you (yellow) */}
+  <div className="relative rounded-xl overflow-hidden" style={{
+    background: 'linear-gradient(135deg, rgba(251,113,133,0.12), rgba(20,20,24,0.85) 50%, rgba(253,224,71,0.12))',
+    border: '1px solid rgba(255,255,255,0.08)',
+    boxShadow: '0 8px 32px -8px rgba(251,113,133,0.2), 0 8px 32px -8px rgba(253,224,71,0.2)',
+  }}>
+    <div className="p-4">
+      <div className="text-[10px] tracking-[0.2em] text-stone-300/80 mb-2">// COUNTER-META BUILD</div>
+      <div className="grid grid-cols-2 gap-3 items-start">
+        <div className="text-left min-w-0">
+          <div className="text-[9px] tracking-[0.25em] text-rose-300/80 mb-1">TARGET</div>
+          <div className="flex items-center gap-1.5">
+            <Crown className="h-4 w-4 text-rose-300 flex-shrink-0" />
+            <div className="text-base font-bold text-white truncate">{result.target.name}</div>
+          </div>
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,113,133,0.15)', border: '1px solid rgba(251,113,133,0.3)', color: '#fda4af' }}>
+              {result.threat.archetype.toUpperCase()}
+            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)', color: '#a8a29e' }}>
+              {Math.round(result.threat.confidence * 100)}% KNOWN
+            </span>
+          </div>
+        </div>
+        <div className="text-right min-w-0">
+          <div className="text-[9px] tracking-[0.25em] text-yellow-300/80 mb-1">YOU PLAY</div>
+          <div className="flex items-center gap-1.5 justify-end">
+            <div className="text-base font-bold text-white truncate">{result.leader.name}</div>
+            <Crown className="h-4 w-4 text-yellow-300 flex-shrink-0" />
+          </div>
+          <div className="flex flex-wrap gap-1 mt-1.5 justify-end">
+            {result.themes.map(t => (
+              <span key={t} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(253,224,71,0.15)', border: '1px solid rgba(253,224,71,0.3)', color: '#fde047' }}>{t}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-2 mt-4">
+        <StatBox label="CARDS" value={`${result.totalCards}/65`} color="#fde047" />
+        <StatBox label="COVERAGE" value={`${Math.round(result.coveragePct * 100)}%`} color={result.coveragePct >= 0.5 ? '#86efac' : result.coveragePct >= 0.25 ? '#fde047' : '#fb7185'} />
+        <StatBox label="THREATS" value={`${result.coveredThreats}/${result.totalThreats}`} color="#7dd3fc" />
+      </div>
+    </div>
+  </div>
+
+  {/* THREAT COVERAGE MATRIX — the centerpiece */}
+  {sortedThreats.length > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(251,113,133,0.2)' }}>
+      <div className="flex items-center gap-2 mb-3">
+        <Crosshair className="h-3.5 w-3.5 text-rose-300" />
+        <div className="text-xs font-bold text-rose-200 tracking-wider">THREAT COVERAGE MATRIX</div>
+      </div>
+      <div className="space-y-2">
+        {sortedThreats.map(([kw, info]) => {
+          const widthThreat = (info.weight / maxWeight) * 100;
+          const covered = info.counterCount > 0;
+          return (
+            <div key={kw} className="text-[11px]">
+              <div className="flex items-center justify-between mb-1 gap-2">
+                <button onClick={() => teach.showKeyword(kw)} className="font-mono tracking-wider transition" style={{ color: covered ? '#fde047' : '#fb7185' }}>
+                  {covered ? '✓' : '⚠'} {kw}
+                </button>
+                <span className="text-stone-500 text-[10px]">
+                  threat {info.weight.toFixed(1)} · counters <span style={{ color: covered ? '#86efac' : '#fb7185' }} className="font-bold">×{info.counterCount}</span>
+                </span>
+              </div>
+              <div className="relative h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                <div className="absolute inset-y-0 left-0 rounded-full" style={{
+                  width: `${widthThreat}%`,
+                  background: covered ? 'linear-gradient(90deg, rgba(134,239,172,0.7), rgba(134,239,172,0.3))' : 'linear-gradient(90deg, rgba(251,113,133,0.7), rgba(251,113,133,0.3))',
+                }} />
+              </div>
+              {covered && info.counterCards.length > 0 && (
+                <div className="text-[10px] text-stone-500 mt-1 truncate">
+                  → {info.counterCards.slice(0, 3).map(cc => `${cc.ourKw}/${cc.name}`).join(' · ')}{info.counterCards.length > 3 ? ` · +${info.counterCards.length - 3}` : ''}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+  {/* Force-type triangle coverage */}
+  {Object.keys(result.triangleCoverage).length > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center gap-2 mb-3">
+        <Shield className="h-3.5 w-3.5 text-yellow-300" />
+        <div className="text-xs font-bold text-yellow-200 tracking-wider">FORCE-TYPE TRIANGLE</div>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {['Ground', 'Air', 'Navy'].map(type => {
+          const info = result.triangleCoverage[type];
+          if (!info) {
+            return (
+              <div key={type} className="text-center rounded-lg p-2 opacity-40" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="text-[9px] tracking-[0.2em] text-stone-400">{type.toUpperCase()}</div>
+                <div className="text-base font-bold mt-1 text-stone-600">—</div>
+                <div className="text-[9px] text-stone-600 mt-0.5">no threat</div>
+              </div>
+            );
+          }
+          const ratio = info.threatCount > 0 ? Math.min(info.counterCount / Math.max(info.threatCount / 4, 1), 1) : 0;
+          const color = ratio >= 0.5 ? '#86efac' : ratio >= 0.2 ? '#fde047' : '#fb7185';
+          return (
+            <div key={type} className="text-center rounded-lg p-2" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="text-[9px] tracking-[0.2em] text-stone-400">{type.toUpperCase()}</div>
+              <div className="text-base font-bold mt-1" style={{ color }}>×{info.counterCount}</div>
+              <div className="text-[9px] text-stone-500 mt-0.5">{info.counterKw}</div>
+              <div className="text-[9px] text-stone-600 mt-0.5">vs {info.threatCount.toFixed(0)} forces</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+  {/* Your deck synergy density */}
+  {Object.keys(result.keywordCounts).length > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center gap-2 mb-2">
+        <Network className="h-3.5 w-3.5 text-yellow-300" />
+        <div className="text-xs font-bold text-yellow-200 tracking-wider">YOUR DECK · SYNERGY DENSITY</div>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {Object.entries(result.keywordCounts).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([kw, n]) => (
+          <button key={kw} onClick={() => teach.showKeyword(kw)} className="text-[11px] px-2 py-1 rounded-md transition" style={{
+            background: 'rgba(253,224,71,0.1)', border: '1px solid rgba(253,224,71,0.3)', color: '#fde047',
+          }}>
+            {kw} <span className="text-yellow-400/70 font-bold ml-1">×{n}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* Cost curve */}
+  {Object.keys(result.costCurve).length > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center gap-2 mb-3">
+        <TrendingUp className="h-3.5 w-3.5 text-yellow-300" />
+        <div className="text-xs font-bold text-yellow-200 tracking-wider">COST CURVE</div>
+      </div>
+      <div className="space-y-2">
+        {[0, 1, 2, 3].map(c => {
+          const n = result.costCurve[c] || 0;
+          const max = Math.max(...Object.values(result.costCurve), 1);
+          return (
+            <div key={c}>
+              <div className="flex justify-between text-[11px] mb-1">
+                <span className="text-stone-300 font-mono">↺ {c}</span>
+                <span className="text-stone-400">{n} cards</span>
+              </div>
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                <div className="h-full rounded-full transition-all" style={{ width: `${(n/max)*100}%`, background: 'linear-gradient(90deg, #fde047, #fb923c)', boxShadow: '0 0 8px rgba(253,224,71,0.4)' }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+  {/* Per-card reasoning */}
+  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="flex items-center gap-2 mb-3">
+      <Brain className="h-3.5 w-3.5 text-yellow-300" />
+      <div className="text-xs font-bold text-yellow-200 tracking-wider">PER-CARD REASONING</div>
+    </div>
+    <div className="space-y-2">
+      {visiblePicks.map(pick => (
+        <CounterReasoningCard key={pick.card.id} pick={pick} teach={teach} />
+      ))}
+    </div>
+    {result.trace.length > 8 && (
+      <button onClick={() => setShowAllPicks(s => !s)} className="w-full mt-3 py-2 rounded-md border border-white/10 text-stone-400 hover:text-yellow-300 hover:border-yellow-400 transition text-[11px] tracking-wider">
+        {showAllPicks ? `← SHOW TOP 8 ONLY` : `SHOW ALL ${result.trace.length} PICKS →`}
+      </button>
+    )}
+  </div>
+
+  {/* Weaknesses */}
+  {result.weaknesses.length > 0 && (
+    <div className="rounded-xl p-4" style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.3)' }}>
+      <div className="flex items-center gap-2 mb-2">
+        <AlertTriangle className="h-3.5 w-3.5 text-rose-300" />
+        <div className="text-xs font-bold text-rose-200 tracking-wider">PREDICTED WEAKNESSES</div>
+      </div>
+      <div className="space-y-1.5 text-xs text-stone-300">
+        {result.weaknesses.map((w, i) => (<div key={i} className="leading-relaxed">{w}</div>))}
+      </div>
+    </div>
+  )}
+
+  <button onClick={onLoad} className="w-full py-4 rounded-xl text-rose-100 hover:text-white transition flex items-center justify-center gap-2 font-bold tracking-wider sticky bottom-20" style={{
+    background: 'linear-gradient(135deg, rgba(251,113,133,0.25), rgba(253,224,71,0.18))',
+    border: '1px solid rgba(251,113,133,0.5)',
+    boxShadow: '0 8px 32px rgba(251,113,133,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+  }}>
+    <Layers className="h-4 w-4" /> SAVE COUNTER DECK
+  </button>
+</div>
+
+);
+}
+
+function CounterReasoningCard({ pick, teach }) {
+const meta = TYPE_META[pick.card.type] || { color: '#9ca3af', glow: 'rgba(0,0,0,0)' };
+return (
+<div className="rounded-lg overflow-hidden" style={{
+background: 'rgba(20,20,24,0.5)',
+border: '1px solid rgba(255,255,255,0.05)',
+}}>
+<button onClick={() => teach.showCard(pick.card.id)} className="w-full text-left p-3 hover:bg-white/[0.03] transition">
+<div className="flex items-center justify-between mb-1">
+<div className="flex items-center gap-2 min-w-0 flex-1">
+<span className="text-[9px] font-bold tracking-wider w-12 flex-shrink-0" style={{ color: meta.color }}>{pick.card.type.slice(0,4).toUpperCase()}</span>
+<span className="text-sm text-white truncate">{pick.card.name}</span>
+<span className="text-[10px] text-stone-500 font-mono">×{pick.copies}</span>
+</div>
+<div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+<span className="text-[10px] text-stone-500">own {pick.ownScore} + ctr {pick.counterScore} =</span>
+<span className="text-yellow-300 font-bold text-sm" style={{ textShadow: '0 0 8px rgba(253,224,71,0.4)' }}>{pick.score}</span>
+</div>
+</div>
+{pick.counterReasons.length > 0 && (
+<div className="space-y-0.5 mt-2">
+{pick.counterReasons.slice(0, 3).map((r, i) => (
+<div key={`c-${i}`} className="flex items-start gap-2 text-[11px]">
+<span className="font-bold w-7 text-right flex-shrink-0 text-rose-300">+{r.pts}</span>
+<span className="text-rose-200/90 leading-relaxed">⚔ {r.why}</span>
+</div>
+))}
+</div>
+)}
+{pick.ownReasons.length > 0 && (
+<div className="space-y-0.5 mt-1">
+{pick.ownReasons.slice(0, 3).map((r, i) => (
+<div key={`o-${i}`} className="flex items-start gap-2 text-[11px]">
+<span className={`font-bold w-7 text-right flex-shrink-0 ${r.pts > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+{r.pts > 0 ? '+' : ''}{r.pts}
+</span>
+<span className="text-stone-400 leading-relaxed">{r.why}</span>
+</div>
+))}
+</div>
+)}
 </button>
 </div>
 );
