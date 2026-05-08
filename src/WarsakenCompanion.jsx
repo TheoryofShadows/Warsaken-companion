@@ -814,8 +814,10 @@ if (arsenalSize === 0 || targetCount === 0) return 0;
 return hypergeomAtLeast(arsenalSize, targetCount, Math.min(draws, arsenalSize), k);
 }
 
-// Shuffle the arsenal (Fisher-Yates) and return the first `handSize` cards.
-function simulateOpeningHand(deck, handSize = 8) {
+// Fisher-Yates shuffle of the arsenal; returns a stable id-order callers can
+// slice for opening-hand + per-turn draws so DRAW +1 reveals the next card
+// from the same deck instead of a fresh reshuffle.
+function shuffleArsenal(deck) {
 const arsenal = [];
 for (const [id, n] of Object.entries(deck)) {
 const c = getCard(id);
@@ -826,7 +828,7 @@ for (let i = arsenal.length - 1; i > 0; i--) {
 const j = Math.floor(Math.random() * (i + 1));
 [arsenal[i], arsenal[j]] = [arsenal[j], arsenal[i]];
 }
-return arsenal.slice(0, Math.min(handSize, arsenal.length)).map(id => getCard(id));
+return arsenal;
 }
 
 // Analyze any deck — archetype, themes, synergies, weaknesses, matchups.
@@ -1047,6 +1049,14 @@ await window.storage.set('decks:meta', JSON.stringify({ active: newActive, ids }
 
 const newDeckId = () => `d_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,7)}`;
 
+// Switch the active deck and persist the selection so reload reopens the same deck.
+const selectActiveDeck = (id) => {
+setActiveDeckId(id);
+if (typeof window === 'undefined' || !window.storage) return;
+const ids = Object.keys(decks);
+window.storage.set('decks:meta', JSON.stringify({ active: id, ids })).catch(() => {});
+};
+
 const createDeck = (name = 'New Deck', initial = {}) => {
 const id = newDeckId();
 const d = { id, name, cards: initial, updated: Date.now() };
@@ -1143,7 +1153,7 @@ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4)
     {tab === 'rules' && <RulesTab />}
     {tab === 'deck' && <DeckTab
       deck={activeDeck} setDeck={setActiveDeckCards}
-      decks={decks} activeDeckId={activeDeckId} setActiveDeckId={setActiveDeckId}
+      decks={decks} activeDeckId={activeDeckId} setActiveDeckId={selectActiveDeck}
       createDeck={createDeck} renameDeck={renameDeck} deleteDeck={deleteDeck}
       storageReady={storageReady}
       onShareToast={(msg) => { setShareToast(msg); setTimeout(() => setShareToast(null), 2400); }}
@@ -2404,7 +2414,9 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
 // Practice / opening-hand simulator with hypergeometric draw probability calc.
 function PracticeSection({ deck, validation }) {
 const teach = useTeach();
-const [hand, setHand] = useState([]);
+// Shuffled id sequence is the source of truth — drawnCount slices it so
+// DRAW +1 appends the next card from the same shuffle instead of reshuffling.
+const [arsenal, setArsenal] = useState([]);
 const [drawnCount, setDrawnCount] = useState(0);
 const [seed, setSeed] = useState(0); // bumps to force a new shuffle on mulligan
 const [probCardId, setProbCardId] = useState(null);
@@ -2429,24 +2441,28 @@ list.push({ card: c, n });
 return list.sort((a, b) => b.n - a.n || a.card.name.localeCompare(b.card.name));
 }, [deck]);
 
-// Draw a fresh opening hand (resets state)
+// Draw a fresh opening hand (reshuffles the arsenal)
 const drawOpeningHand = () => {
-setHand(simulateOpeningHand(deck, 8));
-setDrawnCount(8);
+const a = shuffleArsenal(deck);
+setArsenal(a);
+setDrawnCount(Math.min(8, a.length));
 setSeed(s => s + 1);
 };
 
-// Mulligan: re-draw an opening hand from a fresh shuffle
+// Mulligan: reshuffle and re-draw an opening hand
 const mulligan = () => drawOpeningHand();
 
-// Draw N more cards (turn simulation)
+// Reveal the next card from the existing shuffle (turn simulation)
 const drawNext = () => {
-const drawn = simulateOpeningHand(deck, drawnCount + 1);
-setHand(drawn);
-setDrawnCount(drawnCount + 1);
+setDrawnCount(c => Math.min(c + 1, arsenal.length));
 };
 
-const reset = () => { setHand([]); setDrawnCount(0); };
+const reset = () => { setArsenal([]); setDrawnCount(0); };
+
+const hand = useMemo(
+() => arsenal.slice(0, drawnCount).map(id => getCard(id)).filter(Boolean),
+[arsenal, drawnCount]
+);
 
 const probCard = probCardId ? getCard(probCardId) : null;
 const probCopies = probCardId ? (deck[probCardId] || 0) : 0;
