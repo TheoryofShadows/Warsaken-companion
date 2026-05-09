@@ -1,6 +1,12 @@
 # Warsaken Companion
 
-Mobile-first card browser, deck builder, and AI deck composer for the Warsaken trading card game (sets 000-002).
+An unofficial, fan-made mobile-first card browser, deck builder, and deck composer for the [Warsaken®](https://www.warsaken.com) trading card game (sets 000-002).
+
+> **Warsaken® is created by Brandon Adams and published by Eclectic Nerds LLC.**  
+> This companion app is not affiliated with or endorsed by Eclectic Nerds LLC.  
+> All card names, artwork, rules text, and the Warsaken® trademark are property of Eclectic Nerds LLC.
+
+**Official Warsaken links:** [Website](https://www.warsaken.com) · [Rules](https://rules.warsaken.com) · [Cards](https://warsaken.cards) · [Discord](https://discord.gg/warsaken) · [Twitter/X](https://x.com/TheWarsaken) · [Instagram](https://instagram.com/thewarsaken)
 
 ## Features
 

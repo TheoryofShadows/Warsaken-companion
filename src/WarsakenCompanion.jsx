@@ -1175,6 +1175,9 @@ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4)
       <TabButton active={tab==='ai'} onClick={() => setTab('ai')} icon={Sparkles} label="AI" sub="builder" />
       <TabButton active={tab==='syn'} onClick={() => setTab('syn')} icon={Network} label="SYN" sub="combos" />
     </div>
+    <div className="text-center text-[9px] text-stone-700 pb-1 tracking-wider">
+      Warsaken® · Eclectic Nerds LLC · Fan companion by TheoryofShadows
+    </div>
   </nav>
 
   {/* GLOBAL TEACH POPOVER — surfaces rules contextually from anywhere */}
@@ -1794,6 +1797,7 @@ const sections = [
 { key: 'cardTypes', label: 'TYPES', count: RULES.cardTypes.length },
 { key: 'phases', label: 'PHASES', count: RULES.phases.length },
 { key: 'deck', label: 'DECK', count: null },
+{ key: 'about', label: 'ABOUT', count: null },
 ];
 
 return (
@@ -1828,6 +1832,7 @@ className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${sectio
 {section === 'cardTypes' && <SimpleList items={RULES.cardTypes} search={search} />}
 {section === 'phases' && <SimpleList items={RULES.phases} search={search} />}
 {section === 'deck' && <DeckRules />}
+{section === 'about' && <AboutSection />}
 </main>
 </>
 );
@@ -1894,25 +1899,50 @@ const r = RULES.deckRules;
 return (
 <div className="space-y-3">
 <div className="border border-stone-800 bg-stone-900/40 p-4">
-<div className="text-yellow-300 text-xs font-bold tracking-wider mb-3">STANDARD DECK</div>
-<div className="grid grid-cols-2 gap-3">
-<Stat label="TOTAL" value={r.totalCards} />
-<Stat label="LEADER" value={r.leaders} />
-<Stat label="TERRITORIES" value={r.territories} />
-<Stat label="ARSENAL" value={r.arsenal} />
-</div>
-<div className="mt-3 text-xs text-stone-300 space-y-1">
-<div>• Exactly 1 Leader card</div>
-<div>• Exactly 4 Territory cards (all unique)</div>
-<div>• Exactly 60 Arsenal cards</div>
-<div>• Max {r.maxCopies} copies of any same-titled arsenal card</div>
-</div>
+  <div className="text-yellow-300 text-xs font-bold tracking-wider mb-3">STANDARD DECK</div>
+  <div className="grid grid-cols-2 gap-3">
+    <Stat label="TOTAL" value={r.totalCards} />
+    <Stat label="LEADER" value={r.leaders} />
+    <Stat label="TERRITORIES" value={r.territories} />
+    <Stat label="ARSENAL" value={r.arsenal} />
+  </div>
+  <div className="mt-3 text-xs text-stone-300 space-y-1">
+    <div>• Exactly 1 Leader card</div>
+    <div>• Exactly 4 Territory cards — each must be <span className="text-yellow-300 font-bold">unique</span> (1 copy max per Territory)</div>
+    <div>• Exactly 60 Arsenal cards</div>
+    <div>• Max {r.maxCopies} copies of any same-named arsenal card</div>
+  </div>
 </div>
 <div className="border border-stone-800 bg-stone-900/40 p-4">
-<div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">ARSENAL CARD TYPES</div>
-<div className="text-xs text-stone-300 leading-relaxed">
-Arsenal includes: Force, Building, WMD, Weather, Morale, and Intel cards. Leader and Territory cards are NOT part of the arsenal.
+  <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">ARSENAL CARD TYPES</div>
+  <div className="text-xs text-stone-300 leading-relaxed space-y-1">
+    <div>Arsenal slots may contain: <span className="text-stone-100">Force, G Force, Building, WMD, Weather, Morale, and Intel</span> cards.</div>
+    <div className="text-stone-500">Leader and Territory cards are <span className="text-rose-300">not</span> part of the arsenal and do not count toward the 60-card limit.</div>
+  </div>
 </div>
+<div className="border border-sky-800/40 bg-sky-900/10 p-4">
+  <div className="text-sky-300 text-xs font-bold tracking-wider mb-2">BLITZ MODE</div>
+  <div className="text-xs text-stone-300 leading-relaxed space-y-1">
+    <div>A faster 1v1 format using the same 65-card deck structure. The goal is to eliminate your opponent's Leader directly — but you must first eliminate their Territories or deck before targeting the Leader.</div>
+    <div className="text-stone-500">Blitz is designed as an easy-to-learn entry point. Free pre-made decks are available to new players.</div>
+  </div>
+</div>
+<div className="border border-violet-800/40 bg-violet-900/10 p-4">
+  <div className="text-violet-300 text-xs font-bold tracking-wider mb-2">CABAL MODE (SOLO)</div>
+  <div className="text-xs text-stone-300 leading-relaxed">
+    A solo mode where a single player completes missions by playing against the Cabal — the game's AI opponent. Ideal for deck testing and learning card combinations without needing an opponent.
+  </div>
+</div>
+<div className="border border-stone-800 bg-stone-900/40 p-4">
+  <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">WIN CONDITION</div>
+  <div className="text-xs text-stone-300 leading-relaxed">
+    The last player with a standing Leader wins. A Leader becomes <span className="text-rose-300 font-bold">Compromised</span> when their Morale reaches 0. A Compromised Leader that is eliminated ends the game.
+  </div>
+</div>
+<div className="border border-stone-700/50 bg-stone-900/20 p-3 mt-1">
+  <div className="text-[10px] text-stone-500 leading-relaxed">
+    Deck rules sourced from <span className="text-yellow-300/70">rules.warsaken.com</span> (v{RULES.version}, {RULES.lastupdate}). Warsaken® is a trademark of Eclectic Nerds LLC. Always check the official rules site for the latest updates.
+  </div>
 </div>
 </div>
 );
@@ -1923,6 +1953,84 @@ return (
 <div className="border border-stone-800 bg-stone-950 px-3 py-2">
 <div className="text-[10px] tracking-wider text-stone-500">{label}</div>
 <div className="text-2xl font-bold text-yellow-300 leading-tight">{value}</div>
+</div>
+);
+}
+
+// ============================================================================
+// ABOUT SECTION — credits, disclaimer, links
+// ============================================================================
+function AboutSection() {
+const links = [
+{ label: 'Official Site', href: 'https://www.warsaken.com', sub: 'warsaken.com' },
+{ label: 'Rules', href: 'https://rules.warsaken.com', sub: 'rules.warsaken.com' },
+{ label: 'Card Database', href: 'https://warsaken.cards', sub: 'warsaken.cards' },
+{ label: 'Discord', href: 'https://discord.gg/warsaken', sub: 'discord.gg/warsaken' },
+{ label: 'X / Twitter', href: 'https://x.com/TheWarsaken', sub: '@TheWarsaken' },
+{ label: 'Instagram', href: 'https://instagram.com/thewarsaken', sub: '@thewarsaken' },
+{ label: 'Reddit', href: 'https://reddit.com/r/thewarsaken', sub: 'r/thewarsaken' },
+{ label: 'YouTube', href: 'https://youtube.com/warsaken', sub: 'youtube.com/warsaken' },
+{ label: 'Facebook', href: 'https://facebook.com/thewarsaken', sub: 'thewarsaken' },
+];
+return (
+<div className="space-y-4">
+  <div className="border border-yellow-500/30 bg-yellow-500/5 p-4">
+    <div className="text-[10px] tracking-[0.2em] text-yellow-300/80 mb-2">// WARSAKEN®</div>
+    <div className="text-sm font-bold text-stone-100 mb-3">Created by Brandon Adams · Eclectic Nerds LLC</div>
+    <div className="text-xs text-stone-300 leading-relaxed space-y-2">
+      <p>
+        Warsaken® is a modern military-themed deck construction card game designed by Brandon Adams, who first conceived it at age 17 as a way to connect with his father — a US Army veteran. After revisiting the idea in 2018, he founded <span className="text-yellow-300">Eclectic Nerds LLC</span> and launched Warsaken commercially in 2021.
+      </p>
+      <p>
+        The game features artists from around the world and is published physically and digitally on the WAX blockchain.
+      </p>
+    </div>
+  </div>
+
+  <div className="border border-stone-800 bg-stone-900/40 p-4">
+    <div className="text-yellow-300 text-xs font-bold tracking-wider mb-3">OFFICIAL LINKS</div>
+    <div className="space-y-2">
+      {links.map(l => (
+        <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer"
+          className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-white/5 transition group">
+          <span className="text-xs text-stone-200 group-hover:text-yellow-300 transition">{l.label}</span>
+          <span className="text-[10px] text-stone-500 group-hover:text-stone-300 transition font-mono">{l.sub}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <div className="border border-stone-800 bg-stone-900/40 p-4">
+    <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">ABOUT THIS COMPANION</div>
+    <div className="text-xs text-stone-300 leading-relaxed space-y-2">
+      <p>
+        This is an <span className="text-yellow-300 font-bold">unofficial, fan-made companion app</span> built by <span className="text-yellow-300">TheoryofShadows</span> to help players learn Warsaken faster and build better decks.
+      </p>
+      <p>
+        It is not affiliated with or endorsed by Eclectic Nerds LLC or EN Digital LLC. All card names, artwork, rules text, game terms, and the Warsaken® trademark are property of <span className="text-yellow-300">Eclectic Nerds LLC</span>.
+      </p>
+      <p>
+        Card data is sourced from the WAX blockchain (AtomicAssets, collection: <span className="font-mono text-stone-400">warsaken</span>) and official rules from <span className="font-mono text-stone-400">rules.warsaken.com</span>. Deck recipes are authored by the Warsaken game creators and sourced from <span className="font-mono text-stone-400">rules.warsaken.com/decks</span>.
+      </p>
+    </div>
+  </div>
+
+  <div className="border border-stone-800 bg-stone-900/40 p-4">
+    <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">HOW THE AI BUILDERS WORK</div>
+    <div className="text-xs text-stone-300 leading-relaxed space-y-2">
+      <p><span className="text-yellow-200 font-bold">RECIPE</span> — Loads official deck templates authored by the Warsaken creators from rules.warsaken.com. Cards are resolved from the enriched card pool using type and subtype matching as a fallback when exact IDs aren't available.</p>
+      <p><span className="text-yellow-200 font-bold">NOVEL</span> — Builds an original deck from scratch. Reads your chosen leader's abilities to detect themes, then scores every card in the enriched pool using keyword synergy, cost curve, stat efficiency, and leader-text affinity. Every card pick shows its reasoning.</p>
+      <p><span className="text-yellow-200 font-bold">COUNTER-META</span> — Adversarial builder. Predicts the target leader's likely deck by aggregating their official recipes plus a novel composition, then builds your deck to specifically counter it using keyword counter-edges, force-type denial (ANTI-AIR / ANTI-GROUND / ANTI-NAVAL), and archetype disruption.</p>
+      <p className="text-stone-500">All three builders run entirely in your browser — no server, no API key required. Quality scales with the {'{'}ENRICHED.length{'}'}-card enriched dataset; only leaders with full OCR data are available for Novel and Counter modes.</p>
+    </div>
+  </div>
+
+  <div className="border border-stone-700/40 p-3">
+    <div className="text-[10px] text-stone-600 leading-relaxed text-center">
+      Warsaken® is a registered trademark of Eclectic Nerds LLC. All rights reserved.<br />
+      This companion app is a fan project and is not officially affiliated with Eclectic Nerds LLC.
+    </div>
+  </div>
 </div>
 );
 }
@@ -3041,7 +3149,7 @@ border: '1px solid rgba(253,224,71,0.2)',
 <Award className="h-4 w-4 text-yellow-300 flex-shrink-0 mt-0.5" />
 <div className="text-xs text-stone-200 leading-relaxed">
 <span className="font-bold text-yellow-200">OFFICIAL RECIPES. </span>
-{RECIPES.length} deck templates from rules.warsaken.com -- designed by the game creators. Pick a leader and a recipe; we resolve every slot from the {ENRICHED.length}-card enriched pool with type/subtype matching as fallback.
+{RECIPES.length} deck templates authored by the Warsaken creators (Eclectic Nerds LLC) and sourced from rules.warsaken.com. Each recipe specifies exact cards or flexible slots by type — we resolve every slot from the {ENRICHED.length}-card enriched pool using type and subtype matching as fallback. Recipes are labelled <span className="text-sky-300 font-bold">Blitz</span> (fast 1v1) or <span className="text-yellow-300 font-bold">Standard</span> (full game).ype matching as fallback.
 </div>
 </div>
 </div>
@@ -3114,7 +3222,7 @@ border: '1px solid rgba(253,224,71,0.2)',
 <Brain className="h-4 w-4 text-yellow-300 flex-shrink-0 mt-0.5" />
 <div className="text-xs text-stone-200 leading-relaxed">
 <span className="font-bold text-yellow-200">NOVEL BUILDER. </span>
-Unlike recipes, this composes from scratch. The AI reads your leader's abilities, infers themes, scores every card against your growing deck context, and shows <span className="text-yellow-300 font-bold">visible reasoning for every pick</span>. Decks may be unconventional -- that's the point.
+Composes an original deck from scratch — not a copy of any official recipe. This tool reads your leader's card text, infers their themes (Drone, Soldier, WMD, Territory, etc.), then scores every card in the enriched pool using keyword synergy, cost curve, stat efficiency, and leader-text affinity. Shows <span className="text-yellow-300 font-bold">visible reasoning for every pick</span>. Decks may be unconventional -- that's the point.
 </div>
 </div>
 </div>
@@ -3356,7 +3464,7 @@ border: '1px solid rgba(251,113,133,0.25)',
 <ShieldAlert className="h-4 w-4 text-rose-300 flex-shrink-0 mt-0.5" />
 <div className="text-xs text-stone-200 leading-relaxed">
 <span className="font-bold text-rose-200">COUNTER-META BUILDER. </span>
-Pick the leader you expect to face. The AI predicts their likely build from official recipes plus a Novel composition, scores every card by own-synergy + counter-value against the predicted threat profile, and produces a <span className="text-rose-300 font-bold">threat-coverage matrix</span> showing which of their keywords your deck shuts down.
+Pick the leader you expect to face. This tool predicts their likely deck by aggregating their official recipes (from rules.warsaken.com) plus an inferred Novel composition, then builds your deck to counter it. Scoring blends your own keyword synergy (35%) with counter-value against the predicted threat profile, and produces a <span className="text-rose-300 font-bold">threat-coverage matrix</span> showing which of their keywords your deck shuts down.
 </div>
 </div>
 </div>
