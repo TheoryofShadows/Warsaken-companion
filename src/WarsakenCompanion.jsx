@@ -1361,7 +1361,7 @@ const [showFilters, setShowFilters] = useState(false);
 const [selectedCard, setSelectedCard] = useState(null);
 
 const types = useMemo(() => ['All', ...[...new Set(CARDS.map(c => c.type))].sort()], []);
-const sets = ['All', '000', '001', '002'];
+const sets = useMemo(() => ['All', ...[...new Set(CARDS.map(c => c.setid))].sort()], []);
 const rarities = ['All', 'Common', 'Uncommon', 'Super Rare', 'Heroic', 'Unreal', 'One of One'];
 
 const filtered = useMemo(() => {
@@ -1918,6 +1918,7 @@ return (
   <div className="text-xs text-stone-300 leading-relaxed space-y-1">
     <div>Arsenal slots may contain: <span className="text-stone-100">Force, G Force, Building, WMD, Weather, Morale, and Intel</span> cards.</div>
     <div className="text-stone-500">Leader and Territory cards are <span className="text-rose-300">not</span> part of the arsenal and do not count toward the 60-card limit.</div>
+    <div className="text-stone-500 mt-1">G Force cards are a premium Force variant. Upgrade and Resource cards may appear in some sets as additional arsenal types.</div>
   </div>
 </div>
 <div className="border border-sky-800/40 bg-sky-900/10 p-4">
@@ -2021,7 +2022,7 @@ return (
       <p><span className="text-yellow-200 font-bold">RECIPE</span> — Loads official deck templates authored by the Warsaken creators from rules.warsaken.com. Cards are resolved from the enriched card pool using type and subtype matching as a fallback when exact IDs aren't available.</p>
       <p><span className="text-yellow-200 font-bold">NOVEL</span> — Builds an original deck from scratch. Reads your chosen leader's abilities to detect themes, then scores every card in the enriched pool using keyword synergy, cost curve, stat efficiency, and leader-text affinity. Every card pick shows its reasoning.</p>
       <p><span className="text-yellow-200 font-bold">COUNTER-META</span> — Adversarial builder. Predicts the target leader's likely deck by aggregating their official recipes plus a novel composition, then builds your deck to specifically counter it using keyword counter-edges, force-type denial (ANTI-AIR / ANTI-GROUND / ANTI-NAVAL), and archetype disruption.</p>
-      <p className="text-stone-500">All three builders run entirely in your browser — no server, no API key required. Quality scales with the {'{'}ENRICHED.length{'}'}-card enriched dataset; only leaders with full OCR data are available for Novel and Counter modes.</p>
+      <p className="text-stone-500">All three builders run entirely in your browser — no server, no API key required. The card pool currently has <span className="text-stone-400">{ENRICHED.length} cards with full OCR data</span> out of {CARDS.length} total — only leaders in the enriched set are available for Novel and Counter modes. Recipe mode works for all {CARDS.length} cards.</p>
     </div>
   </div>
 
