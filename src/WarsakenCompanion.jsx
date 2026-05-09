@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, createContext, useContext, useCallback } from 'react';
+﻿import React, { useState, useMemo, useEffect, createContext, useContext, useCallback } from 'react';
 import { Search, X, Filter, Bookmark, BookmarkCheck, ChevronRight, Crown, MapPin, Skull, Star, Shield, Cloud, Eye, Heart, Building2, Wrench, Wind, ExternalLink, ImageOff, BookOpen, Layers, AlertTriangle, CheckCircle2, Plus, Minus, Trash2, Library, Sparkles, Brain, Zap as ZapIcon, Activity, ArrowRight, Loader2, Network, GitBranch, Flame, Target, Info, Lightbulb, TrendingUp, Award, Compass, Swords, Share2, Command, Crosshair, ShieldAlert } from 'lucide-react';
 import CommandPalette from './CommandPalette.jsx';
 import ShareBanner from './ShareBanner.jsx';
@@ -673,7 +673,7 @@ const SET_NAMES = {
 
 // Each type has a primary color, a glow, and a gradient used as background tint.
 const TYPE_META = {
-'Leader':    { Icon: Crown,      color: '#fde047', glow: 'rgba(253,224,71,0.45)',  grad: 'from-yellow-500/20 via-yellow-500/5 to-transparent' },
+'Leader':    { Icon: Crown,      color: '#cc2200', glow: 'rgba(253,224,71,0.45)',  grad: 'from-yellow-500/20 via-yellow-500/5 to-transparent' },
 'Force':     { Icon: Swords,     color: '#fb923c', glow: 'rgba(251,146,60,0.45)',  grad: 'from-orange-500/20 via-orange-500/5 to-transparent' },
 'Territory': { Icon: MapPin,     color: '#86efac', glow: 'rgba(134,239,172,0.4)',  grad: 'from-emerald-500/20 via-emerald-500/5 to-transparent' },
 'Building':  { Icon: Building2,  color: '#5eead4', glow: 'rgba(94,234,212,0.4)',   grad: 'from-teal-500/20 via-teal-500/5 to-transparent' },
@@ -1120,18 +1120,18 @@ const closeTeach = useCallback(() => { setTeachKeyword(null); setTeachCardId(nul
 
 return (
 <TeachContext.Provider value={{ showKeyword, showCard }}>
-<div className="min-h-screen text-stone-100 flex flex-col relative overflow-hidden" style={{ fontFamily: '"JetBrains Mono", ui-monospace, monospace', background: '#0a0a0c' }}>
+<div className="min-h-screen text-mil-paper flex flex-col relative overflow-hidden" style={{ fontFamily: "'Oswald', Impact, sans-serif", background: '#0d1a0f' }}>
 {/* Layered backdrop: deep base + radial glow + subtle grid + vignette */}
 <div className="pointer-events-none fixed inset-0 z-0">
 <div className="absolute inset-0" style={{
-background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(253,224,71,0.08) 0%, transparent 50%), radial-gradient(ellipse 60% 50% at 100% 100%, rgba(251,113,133,0.06) 0%, transparent 50%), radial-gradient(ellipse 60% 50% at 0% 100%, rgba(125,211,252,0.05) 0%, transparent 50%)'
+background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(204,34,0,0.08) 0%, transparent 50%), radial-gradient(ellipse 60% 50% at 100% 100%, rgba(251,113,133,0.06) 0%, transparent 50%), radial-gradient(ellipse 60% 50% at 0% 100%, rgba(125,211,252,0.05) 0%, transparent 50%)'
 }} />
 <div className="absolute inset-0 opacity-[0.025]" style={{
 backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
 backgroundSize: '32px 32px',
 }} />
 <div className="absolute inset-0" style={{
-background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%)'
+background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%)'
 }} />
 </div>
 
@@ -1164,7 +1164,7 @@ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4)
 
   {/* TAB BAR — glass surface with active glow */}
   <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-white/[0.06]" style={{
-    background: 'linear-gradient(180deg, rgba(10,10,12,0.85) 0%, rgba(10,10,12,0.98) 100%)',
+    background: 'linear-gradient(180deg, rgba(13,26,15,0.92) 0%, rgba(8,15,10,0.99) 100%)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
   }}>
@@ -1197,17 +1197,17 @@ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4)
 
   <button
     onClick={() => setCommandOpen(true)}
-    className="hidden sm:flex fixed top-3 right-3 z-30 items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-900/80 backdrop-blur border border-stone-700 text-stone-300 text-xs hover:border-yellow-500/50 hover:text-yellow-300 transition"
+    className="hidden sm:flex fixed top-3 right-3 z-30 items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-900/80 backdrop-blur border border-mil-green text-mil-stone text-xs hover:border-mil-red/50 hover:text-mil-red transition"
     aria-label="Open command palette"
   >
     <Search className="h-3 w-3" />
     <span>Search</span>
-    <kbd className="text-[10px] text-stone-500 px-1 py-0.5 rounded border border-stone-700">⌘K</kbd>
+    <kbd className="text-[10px] text-mil-ghost px-1 py-0.5 rounded border border-mil-green">⌘K</kbd>
   </button>
 
   {shareToast && (
     <div className="fixed bottom-20 inset-x-0 z-40 flex justify-center pointer-events-none">
-      <div className="px-4 py-2 rounded-full bg-stone-900 border border-yellow-500/30 text-yellow-200 text-xs tracking-wider shadow-lg animate-[fadeIn_0.2s_ease-out]">
+      <div className="px-4 py-2 rounded-full bg-mil-panel border border-mil-red/30 text-mil-paper text-xs tracking-wider shadow-lg animate-[fadeIn_0.2s_ease-out]">
         {shareToast}
       </div>
     </div>
@@ -1250,34 +1250,34 @@ return (
 <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} />
 <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
 <div className="relative mx-auto max-w-md p-4 pb-24">
-<div className="relative rounded-2xl overflow-hidden border border-yellow-400/30" style={{
-background: 'linear-gradient(180deg, rgba(28,25,23,0.95) 0%, rgba(15,15,17,0.98) 100%)',
-boxShadow: '0 -20px 80px -20px rgba(253,224,71,0.25), 0 0 0 1px rgba(253,224,71,0.1)',
+<div className="relative rounded-2xl overflow-hidden border border-mil-red/30" style={{
+background: 'linear-gradient(180deg, rgba(13,26,15,0.96) 0%, rgba(8,15,10,0.99) 100%)',
+boxShadow: '0 -20px 80px -20px rgba(204,34,0,0.25), 0 0 0 1px rgba(204,34,0,0.1)',
 }}>
-<div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(253,224,71,0.6), transparent)' }} />
+<div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(204,34,0,0.6), transparent)' }} />
 <div className="p-5">
 <div className="flex items-start justify-between gap-3 mb-3">
 <div className="flex items-center gap-2">
-<div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(253,224,71,0.15)', boxShadow: '0 0 24px rgba(253,224,71,0.3)' }}>
-<Lightbulb className="h-4 w-4 text-yellow-300" />
+<div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(204,34,0,0.15)', boxShadow: '0 0 24px rgba(204,34,0,0.3)' }}>
+<Lightbulb className="h-4 w-4 text-mil-red" />
 </div>
 <div>
-<div className="text-[10px] tracking-[0.2em] text-yellow-300/80">// KEYWORD</div>
-<div className="text-xl font-bold text-yellow-100 leading-tight">{keyword}</div>
+<div className="text-[10px] tracking-[0.2em] text-mil-red/80">// KEYWORD</div>
+<div className="text-xl font-bold text-mil-paper leading-tight">{keyword}</div>
 </div>
 </div>
-<button onClick={onClose} className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-white/10 transition text-stone-400 hover:text-white"><X className="h-4 w-4" /></button>
+<button onClick={onClose} className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-mil-muted/40 transition text-mil-fade hover:text-white"><X className="h-4 w-4" /></button>
 </div>
 
           {!k ? (
-            <div className="text-sm text-stone-400">No rule found for this keyword.</div>
+            <div className="text-sm text-mil-fade">No rule found for this keyword.</div>
           ) : (
             <>
               {k.text && (
-                <div className="text-base text-stone-100 leading-relaxed mb-3 font-medium">{k.text}</div>
+                <div className="text-base text-mil-paper leading-relaxed mb-3 font-medium">{k.text}</div>
               )}
               {k.detail && (
-                <div className="text-xs text-stone-400 leading-relaxed mb-4 pb-4 border-b border-white/5">{k.detail}</div>
+                <div className="text-xs text-mil-fade leading-relaxed mb-4 pb-4 border-b border-white/5">{k.detail}</div>
               )}
 
               {edges.counters.length > 0 && (
@@ -1298,12 +1298,12 @@ boxShadow: '0 -20px 80px -20px rgba(253,224,71,0.25), 0 0 0 1px rgba(253,224,71,
 
               {edges.refs.length > 0 && (
                 <div className="mb-3">
-                  <div className="text-[10px] tracking-wider text-stone-400 mb-1.5">RELATED RULES</div>
+                  <div className="text-[10px] tracking-wider text-mil-fade mb-1.5">RELATED RULES</div>
                   <div className="flex flex-wrap gap-1.5">
                     {edges.refs.slice(0, 8).map((e, i) => {
                       const other = e[0].toUpperCase() === keyword.toUpperCase() ? e[1] : e[0];
                       return (
-                        <button key={i} onClick={() => showKeyword(other)} className="text-[11px] px-2 py-1 rounded-md bg-white/5 border border-white/10 text-stone-200 hover:bg-white/10 transition">
+                        <button key={i} onClick={() => showKeyword(other)} className="text-[11px] px-2 py-1 rounded-md bg-mil-muted/30 border border-white/10 text-mil-stone hover:bg-mil-muted/40 transition">
                           {other}
                         </button>
                       );
@@ -1314,12 +1314,12 @@ boxShadow: '0 -20px 80px -20px rgba(253,224,71,0.25), 0 0 0 1px rgba(253,224,71,
 
               {cardsUsing.length > 0 && (
                 <div>
-                  <div className="text-[10px] tracking-wider text-stone-400 mb-1.5">CARDS USING THIS ({cardsUsing.length})</div>
+                  <div className="text-[10px] tracking-wider text-mil-fade mb-1.5">CARDS USING THIS ({cardsUsing.length})</div>
                   <div className="space-y-1">
                     {cardsUsing.slice(0, 6).map(c => (
-                      <button key={c.id} onClick={() => showCard(c.id)} className="w-full text-left flex items-center gap-2 text-xs hover:text-yellow-300 transition py-0.5">
-                        <span className="text-stone-200 truncate flex-1">{c.name}</span>
-                        <span className="text-stone-600 text-[10px]">{c.id}</span>
+                      <button key={c.id} onClick={() => showCard(c.id)} className="w-full text-left flex items-center gap-2 text-xs hover:text-mil-red transition py-0.5">
+                        <span className="text-mil-stone truncate flex-1">{c.name}</span>
+                        <span className="text-mil-ghost/70 text-[10px]">{c.id}</span>
                       </button>
                     ))}
                   </div>
@@ -1338,13 +1338,13 @@ boxShadow: '0 -20px 80px -20px rgba(253,224,71,0.25), 0 0 0 1px rgba(253,224,71,
 
 function TabButton({ active, onClick, icon: Icon, label, sub }) {
 return (
-<button onClick={onClick} className={`relative flex flex-col items-center justify-center py-2.5 transition-all ${active ? 'text-yellow-300' : 'text-stone-500 hover:text-stone-200'}`}>
+<button onClick={onClick} className={`relative flex flex-col items-center justify-center py-2.5 transition-all ${active ? 'text-mil-red' : 'text-mil-ghost hover:text-mil-stone'}`}>
 {active && (
-<span className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-8" style={{ background: 'linear-gradient(90deg, transparent, #fde047, transparent)', boxShadow: '0 0 8px rgba(253,224,71,0.6)' }} />
+<span className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-8" style={{ background: 'linear-gradient(90deg, transparent, #cc2200, transparent)', boxShadow: '0 0 8px rgba(204,34,0,0.6)' }} />
 )}
-<Icon className={`h-4 w-4 transition-transform ${active ? 'scale-110' : ''}`} style={active ? { filter: 'drop-shadow(0 0 6px rgba(253,224,71,0.5))' } : {}} />
+<Icon className={`h-4 w-4 transition-transform ${active ? 'scale-110' : ''}`} style={active ? { filter: 'drop-shadow(0 0 6px rgba(204,34,0,0.5))' } : {}} />
 <span className="text-[10px] tracking-wider mt-0.5 font-bold">{label}</span>
-<span className={`text-[9px] ${active ? 'text-yellow-400/70' : 'text-stone-600'}`}>{sub}</span>
+<span className={`text-[9px] ${active ? 'text-mil-red/70' : 'text-mil-ghost/70'}`}>{sub}</span>
 </button>
 );
 }
@@ -1402,32 +1402,32 @@ return next;
 return (
 <>
 <header className="sticky top-0 z-30 border-b border-white/[0.06]" style={{
-background: 'linear-gradient(180deg, rgba(20,20,24,0.92) 0%, rgba(15,15,18,0.98) 100%)',
+background: 'linear-gradient(180deg, rgba(8,15,10,0.94) 0%, rgba(8,15,10,0.99) 100%)',
 backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
 }}>
 <div className="px-4 py-3">
 <div className="flex items-center justify-between mb-3">
 <div className="flex items-center gap-2">
-<div className="h-7 w-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(253,224,71,0.15)', boxShadow: '0 0 16px rgba(253,224,71,0.2)' }}>
-<Library className="h-3.5 w-3.5 text-yellow-300" />
+<div className="h-7 w-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(204,34,0,0.15)', boxShadow: '0 0 16px rgba(204,34,0,0.2)' }}>
+<Library className="h-3.5 w-3.5 text-mil-red" />
 </div>
-<h1 className="text-xs tracking-[0.25em] text-yellow-100/90 uppercase font-semibold">Card Library</h1>
+<h1 className="text-xs tracking-[0.25em] text-mil-paper uppercase font-semibold">Card Library</h1>
 </div>
-<span className="text-[10px] text-stone-500 tracking-wider">{CARDS.length} TOTAL</span>
+<span className="text-[10px] text-mil-ghost tracking-wider">{CARDS.length} TOTAL</span>
 </div>
 <div className="relative">
-<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-500" />
+<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mil-ghost" />
 <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, ID, ability text, keywords, flavor..."
-className="w-full pl-10 pr-10 py-2.5 text-sm text-white placeholder:text-stone-600 focus:outline-none transition rounded-lg"
-style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)' }} />
-{query && (<button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-white"><X className="h-4 w-4" /></button>)}
+className="w-full pl-10 pr-10 py-2.5 text-sm text-white placeholder:text-mil-ghost/70 focus:outline-none transition rounded-lg"
+style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.08)' }} />
+{query && (<button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-mil-ghost hover:text-white"><X className="h-4 w-4" /></button>)}
 </div>
 <div className="flex items-center justify-between mt-2">
-<button onClick={() => setShowFilters(s => !s)} className="flex items-center gap-1.5 text-xs text-stone-400 hover:text-yellow-300 transition">
+<button onClick={() => setShowFilters(s => !s)} className="flex items-center gap-1.5 text-xs text-mil-fade hover:text-mil-red transition">
 <Filter className="h-3 w-3" /> FILTERS
 {activeFilterCount > 0 && (<span className="ml-1 px-1.5 py-0.5 text-[10px] bg-yellow-400 text-stone-950 font-bold rounded-md">{activeFilterCount}</span>)}
 </button>
-<span className="text-[10px] text-stone-500 tracking-wider">{filtered.length} / {CARDS.length}</span>
+<span className="text-[10px] text-mil-ghost tracking-wider">{filtered.length} / {CARDS.length}</span>
 </div>
 </div>
 {showFilters && (
@@ -1435,14 +1435,14 @@ style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08
 <FilterRow label="TYPE" value={filterType} options={types} onChange={setFilterType} />
 <FilterRow label="SET" value={filterSet} options={sets} onChange={setFilterSet} renderLabel={(v) => v === 'All' ? 'All' : `${v} · ${SET_NAMES[v] || ''}`} />
 <FilterRow label="RARITY" value={filterRarity} options={rarities} onChange={setFilterRarity} />
-{activeFilterCount > 0 && (<button onClick={clearFilters} className="w-full text-xs text-stone-400 hover:text-yellow-300 py-1.5 rounded-md border border-white/10 hover:border-yellow-400/50 transition">CLEAR FILTERS</button>)}
+{activeFilterCount > 0 && (<button onClick={clearFilters} className="w-full text-xs text-mil-fade hover:text-mil-red py-1.5 rounded-md border border-white/10 hover:border-mil-red/50 transition">CLEAR FILTERS</button>)}
 </div>
 )}
 </header>
 
   <main className="px-4 py-4">
     {filtered.length === 0 ? (
-      <div className="py-20 text-center"><Skull className="h-8 w-8 mx-auto text-stone-700 mb-3" /><p className="text-sm text-stone-400">no cards match.</p></div>
+      <div className="py-20 text-center"><Skull className="h-8 w-8 mx-auto text-stone-700 mb-3" /><p className="text-sm text-mil-fade">no cards match.</p></div>
     ) : (
       <div className="space-y-2">
         {filtered.slice(0, 100).map(card => (
@@ -1451,7 +1451,7 @@ style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08
             onAdd={() => addToDeck(card.id)}
             onRemove={() => removeFromDeck(card.id)} />
         ))}
-        {filtered.length > 100 && (<div className="py-4 text-center text-xs text-stone-500 tracking-wider border border-dashed border-stone-800">SHOWING 100 / {filtered.length} · REFINE FILTERS</div>)}
+        {filtered.length > 100 && (<div className="py-4 text-center text-xs text-mil-ghost tracking-wider border border-dashed border-mil-border">SHOWING 100 / {filtered.length} · REFINE FILTERS</div>)}
       </div>
     )}
   </main>
@@ -1465,11 +1465,11 @@ style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08
 function FilterRow({ label, value, options, onChange, renderLabel }) {
 return (
 <div>
-<div className="text-[10px] text-stone-400 mb-1 tracking-wider">{label}</div>
+<div className="text-[10px] text-mil-fade mb-1 tracking-wider">{label}</div>
 <div className="flex flex-wrap gap-1">
 {options.map(opt => (
 <button key={opt} onClick={() => onChange(opt)}
-className={`text-[11px] px-2 py-1 border transition ${value === opt ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400 hover:border-stone-600 hover:text-stone-200'}`}>
+className={`text-[11px] px-2 py-1 border transition ${value === opt ? 'border-mil-red text-mil-red bg-mil-red/10' : 'border-mil-border text-mil-fade hover:border-stone-600 hover:text-mil-stone'}`}>
 {renderLabel ? renderLabel(opt) : opt}
 </button>
 ))}
@@ -1488,14 +1488,14 @@ return (
 <div className={`group relative rounded-xl overflow-hidden transition-all duration-200 cursor-pointer ${inDeck ? 'ring-1 ring-yellow-400/40' : 'ring-1 ring-white/5 hover:ring-white/15'}`}
 style={{
 background: `linear-gradient(135deg, ${meta.glow.replace(/[\d.]+\)/, '0.08)')} 0%, rgba(20,20,24,0.85) 35%, rgba(15,15,18,0.95) 100%)`,
-boxShadow: inDeck ? `0 0 24px ${meta.glow.replace(/[\d.]+\)/, '0.15)')}, inset 0 0 0 1px rgba(253,224,71,0.15)` : '0 1px 0 rgba(255,255,255,0.03) inset',
+boxShadow: inDeck ? `0 0 24px ${meta.glow.replace(/[\d.]+\)/, '0.15)')}, inset 0 0 0 1px rgba(204,34,0,0.15)` : '0 1px 0 rgba(255,255,255,0.03) inset',
 }}>
 <div className="flex items-stretch">
 {/* Type icon column with glow */}
 <div className="flex-shrink-0 w-14 flex flex-col items-center justify-center py-2 relative" onClick={onClick} style={{ background: 'rgba(0,0,0,0.25)' }}>
 <div className="absolute inset-y-0 right-0 w-px" style={{ background: `linear-gradient(180deg, transparent, ${meta.glow}, transparent)` }} />
 <Icon className="h-5 w-5 transition-transform group-hover:scale-110" style={{ color: meta.color, filter: `drop-shadow(0 0 8px ${meta.glow})` }} />
-<span className="text-[8px] tracking-wider text-stone-500 mt-1 font-mono">{card.setid}</span>
+<span className="text-[8px] tracking-wider text-mil-ghost mt-1 font-mono">{card.setid}</span>
 </div>
 
     {/* Main info */}
@@ -1507,16 +1507,16 @@ boxShadow: inDeck ? `0 0 24px ${meta.glow.replace(/[\d.]+\)/, '0.15)')}, inset 0
         <span className="text-[10px] tracking-wider truncate" style={{ color: rarMeta.color }}>{card.rarity}</span>
       </div>
       <div className="text-sm text-stone-50 truncate font-medium leading-tight">{card.name}</div>
-      <div className="text-[10px] text-stone-500 mt-0.5 font-mono">{card.id}</div>
+      <div className="text-[10px] text-mil-ghost mt-0.5 font-mono">{card.id}</div>
     </div>
 
     {/* Counter controls */}
     <div className="flex-shrink-0 flex items-center" style={{ background: 'rgba(0,0,0,0.35)' }}>
-      <button onClick={(e) => { e.stopPropagation(); onRemove(); }} className="px-2.5 h-full text-stone-500 hover:text-rose-400 transition disabled:opacity-30" disabled={count === 0}>
+      <button onClick={(e) => { e.stopPropagation(); onRemove(); }} className="px-2.5 h-full text-mil-ghost hover:text-rose-400 transition disabled:opacity-30" disabled={count === 0}>
         <Minus className="h-3.5 w-3.5" />
       </button>
-      <span className={`text-sm font-bold w-7 text-center ${count > 0 ? 'text-yellow-300' : 'text-stone-600'}`} style={count > 0 ? { textShadow: '0 0 8px rgba(253,224,71,0.5)' } : {}}>{count}</span>
-      <button onClick={(e) => { e.stopPropagation(); onAdd(); }} className="px-2.5 h-full text-stone-500 hover:text-yellow-300 transition">
+      <span className={`text-sm font-bold w-7 text-center ${count > 0 ? 'text-mil-red' : 'text-mil-ghost/70'}`} style={count > 0 ? { textShadow: '0 0 8px rgba(204,34,0,0.5)' } : {}}>{count}</span>
+      <button onClick={(e) => { e.stopPropagation(); onAdd(); }} className="px-2.5 h-full text-mil-ghost hover:text-mil-red transition">
         <Plus className="h-3.5 w-3.5" />
       </button>
     </div>
@@ -1558,31 +1558,31 @@ filter: 'blur(40px) saturate(1.4)',
 
   <div className="relative min-h-full flex items-start justify-center p-3 pt-6" onClick={(e) => e.stopPropagation()}>
     <div className="w-full max-w-md relative rounded-2xl overflow-hidden" style={{
-      background: 'linear-gradient(180deg, rgba(20,20,24,0.92) 0%, rgba(12,12,15,0.96) 100%)',
+      background: 'linear-gradient(180deg, rgba(8,15,10,0.94) 0%, rgba(12,12,15,0.96) 100%)',
       boxShadow: `0 20px 80px -10px ${meta.glow.replace(/[\d.]+\)/, '0.3)')}, 0 0 0 1px rgba(255,255,255,0.08)`,
     }}>
       {/* Top accent line in type color */}
       <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${meta.color}, transparent)`, boxShadow: `0 0 12px ${meta.glow}` }} />
 
       {/* Close button */}
-      <button onClick={onClose} className="absolute top-3 right-3 z-20 h-9 w-9 flex items-center justify-center text-stone-200 hover:text-white hover:bg-white/10 transition rounded-full" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
+      <button onClick={onClose} className="absolute top-3 right-3 z-20 h-9 w-9 flex items-center justify-center text-mil-stone hover:text-white hover:bg-mil-muted/40 transition rounded-full" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
         <X className="h-4 w-4" />
       </button>
 
       {/* Header strip */}
-      <div className="px-4 py-2 flex items-center justify-between text-[10px] tracking-[0.2em] text-stone-500 border-b border-white/[0.04]">
+      <div className="px-4 py-2 flex items-center justify-between text-[10px] tracking-[0.2em] text-mil-ghost border-b border-white/[0.04]">
         <span className="font-mono">FILE: {card.id}</span>
-        <span className="truncate ml-2 text-yellow-300/60">{(SET_NAMES[card.setid] || card.setid).toUpperCase()}</span>
+        <span className="truncate ml-2 text-mil-red/60">{(SET_NAMES[card.setid] || card.setid).toUpperCase()}</span>
       </div>
 
       {/* Card image with vignette */}
       <div className="relative bg-black flex items-center justify-center" style={{ minHeight: '340px' }}>
         {!imgFailed ? (<>
-          {!imgLoaded && (<div className="absolute inset-0 flex items-center justify-center"><Loader2 className="h-6 w-6 text-stone-500 animate-spin" /></div>)}
+          {!imgLoaded && (<div className="absolute inset-0 flex items-center justify-center"><Loader2 className="h-6 w-6 text-mil-ghost animate-spin" /></div>)}
           <img src={card.img} alt={card.name} className="w-full h-auto block transition-opacity duration-500" onLoad={() => setImgLoaded(true)} onError={() => setImgFailed(true)}
             style={{ opacity: imgLoaded ? 1 : 0 }} />
           {imgLoaded && <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent 70%, rgba(12,12,15,0.4) 100%)' }} />}
-        </>) : (<div className="h-72 w-full flex flex-col items-center justify-center gap-2"><ImageOff className="h-12 w-12 text-stone-700" /><span className="text-xs text-stone-500 tracking-wider">IMAGE UNAVAILABLE</span></div>)}
+        </>) : (<div className="h-72 w-full flex flex-col items-center justify-center gap-2"><ImageOff className="h-12 w-12 text-stone-700" /><span className="text-xs text-mil-ghost tracking-wider">IMAGE UNAVAILABLE</span></div>)}
       </div>
 
       <div className="p-5 space-y-4">
@@ -1593,7 +1593,7 @@ filter: 'blur(40px) saturate(1.4)',
             <span className="font-bold" style={{ color: meta.color }}>{card.type.toUpperCase()}</span>
             {enriched?.subtype && <>
               <span className="text-stone-700">·</span>
-              <span className="text-stone-300">{enriched.subtype}</span>
+              <span className="text-mil-stone">{enriched.subtype}</span>
             </>}
             <span className="text-stone-700">·</span>
             <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: rarMeta.color, boxShadow: `0 0 6px ${rarMeta.glow}` }} />
@@ -1606,10 +1606,10 @@ filter: 'blur(40px) saturate(1.4)',
         {enriched && (enriched.atk !== null || enriched.hp !== null || enriched.cost !== null || enriched.morale !== null) && (
           <div className="grid grid-cols-3 gap-2">
             {typeof enriched.cost === 'number' && (
-              <StatBox label="↺ COST" value={enriched.cost} color="#fde047" />
+              <StatBox label="↺ COST" value={enriched.cost} color="#cc2200" />
             )}
             {typeof enriched.morale === 'number' && (
-              <StatBox label="MORALE" value={enriched.morale} color="#fde047" />
+              <StatBox label="MORALE" value={enriched.morale} color="#cc2200" />
             )}
             {typeof enriched.atk === 'number' && card.type !== 'WMD' && (
               <StatBox label="ATTACK" value={enriched.atk} color="#fb923c" />
@@ -1623,7 +1623,7 @@ filter: 'blur(40px) saturate(1.4)',
         {/* Abilities — with tappable keyword highlights */}
         {enriched?.abilities && enriched.abilities.length > 0 && (
           <div className="space-y-2">
-            <div className="text-[10px] tracking-[0.15em] text-stone-500">// ABILITIES — TAP KEYWORDS TO LEARN</div>
+            <div className="text-[10px] tracking-[0.15em] text-mil-ghost">// ABILITIES — TAP KEYWORDS TO LEARN</div>
             {enriched.abilities.map((a, i) => <AbilityCard key={i} ability={a} />)}
           </div>
         )}
@@ -1645,13 +1645,13 @@ filter: 'blur(40px) saturate(1.4)',
         {/* Keywords summary chips (always tappable) */}
         {enriched?.keywords && enriched.keywords.length > 0 && (
           <div>
-            <div className="text-[10px] tracking-[0.15em] text-stone-500 mb-1.5">KEYWORDS</div>
+            <div className="text-[10px] tracking-[0.15em] text-mil-ghost mb-1.5">KEYWORDS</div>
             <div className="flex flex-wrap gap-1.5">
               {enriched.keywords.map(kw => (
                 <button key={kw} onClick={() => teach.showKeyword(kw)} className="text-[11px] font-bold tracking-wider px-2.5 py-1 rounded-md transition" style={{
-                  background: 'rgba(253,224,71,0.08)',
-                  border: '1px solid rgba(253,224,71,0.25)',
-                  color: '#fde047',
+                  background: 'rgba(204,34,0,0.08)',
+                  border: '1px solid rgba(204,34,0,0.25)',
+                  color: '#cc2200',
                 }}>
                   {kw}
                 </button>
@@ -1662,34 +1662,34 @@ filter: 'blur(40px) saturate(1.4)',
 
         {/* Flavor */}
         {enriched?.flavor && (
-          <div className="text-xs italic text-stone-400 leading-relaxed border-l-2 pl-3" style={{ borderColor: meta.color }}>
+          <div className="text-xs italic text-mil-fade leading-relaxed border-l-2 pl-3" style={{ borderColor: meta.color }}>
             "{enriched.flavor}"
           </div>
         )}
 
         {/* Add/Remove */}
         <div className="flex items-center gap-2 pt-2">
-          <button onClick={onRemove} disabled={!count} className="flex-1 py-3 rounded-lg border border-white/10 text-stone-300 hover:border-rose-400 hover:text-rose-400 hover:bg-rose-500/5 transition disabled:opacity-30 flex items-center justify-center gap-2">
+          <button onClick={onRemove} disabled={!count} className="flex-1 py-3 rounded-lg border border-white/10 text-mil-stone hover:border-rose-400 hover:text-rose-400 hover:bg-rose-500/5 transition disabled:opacity-30 flex items-center justify-center gap-2">
             <Minus className="h-4 w-4" /><span className="text-xs tracking-wider font-bold">REMOVE</span>
           </button>
-          <div className="px-4 py-3 rounded-lg border border-white/10 text-yellow-300 font-bold min-w-[3.5rem] text-center" style={{ background: 'rgba(0,0,0,0.4)' }}>{count || 0}</div>
-          <button onClick={onAdd} className="flex-1 py-3 rounded-lg border text-yellow-300 hover:text-yellow-200 transition flex items-center justify-center gap-2 font-bold" style={{
-            borderColor: 'rgba(253,224,71,0.4)',
-            background: 'linear-gradient(135deg, rgba(253,224,71,0.18), rgba(253,224,71,0.05))',
-            boxShadow: '0 0 24px rgba(253,224,71,0.15), inset 0 1px 0 rgba(255,255,255,0.05)',
+          <div className="px-4 py-3 rounded-lg border border-white/10 text-mil-red font-bold min-w-[3.5rem] text-center" style={{ background: 'rgba(0,0,0,0.6)' }}>{count || 0}</div>
+          <button onClick={onAdd} className="flex-1 py-3 rounded-lg border text-mil-red hover:text-mil-paper transition flex items-center justify-center gap-2 font-bold" style={{
+            borderColor: 'rgba(204,34,0,0.4)',
+            background: 'linear-gradient(135deg, rgba(253,224,71,0.18), rgba(204,34,0,0.05))',
+            boxShadow: '0 0 24px rgba(204,34,0,0.15), inset 0 1px 0 rgba(58,107,39,0.15)',
           }}>
             <Plus className="h-4 w-4" /><span className="text-xs tracking-wider">ADD TO DECK</span>
           </button>
         </div>
 
-        <div className="text-[10px] text-stone-500 tracking-wider pt-2 border-t border-white/5">
-          <div className="flex justify-between"><span>SET</span><span className="text-stone-300">{card.setid} · {SET_NAMES[card.setid] || ''}</span></div>
+        <div className="text-[10px] text-mil-ghost tracking-wider pt-2 border-t border-white/5">
+          <div className="flex justify-between"><span>SET</span><span className="text-mil-stone">{card.setid} · {SET_NAMES[card.setid] || ''}</span></div>
           <div className="flex justify-between mt-1"><span>RARITY</span><span style={{ color: rarMeta.color }}>{card.rarity}</span></div>
           {!enriched && (
             <div className="mt-2 text-yellow-500/70 text-[10px]">// Card data not yet enriched — run warsaken_enrich.py to populate.</div>
           )}
         </div>
-        <a href={card.url} target="_blank" rel="noopener noreferrer" className="block text-center px-3 py-2 rounded-md border border-white/10 text-stone-400 hover:border-yellow-400 hover:text-yellow-300 transition text-xs tracking-wider">
+        <a href={card.url} target="_blank" rel="noopener noreferrer" className="block text-center px-3 py-2 rounded-md border border-white/10 text-mil-fade hover:border-mil-red hover:text-mil-red transition text-xs tracking-wider">
           <ExternalLink className="h-3 w-3 inline mr-1.5" />VIEW ON WARSAKEN
         </a>
       </div>
@@ -1703,10 +1703,10 @@ filter: 'blur(40px) saturate(1.4)',
 function StatBox({ label, value, color }) {
 return (
 <div className="rounded-lg p-2.5 text-center relative overflow-hidden" style={{
-background: `linear-gradient(180deg, ${color}15 0%, rgba(0,0,0,0.3) 100%)`,
+background: `linear-gradient(180deg, ${color}15 0%, rgba(0,0,0,0.65) 100%)`,
 border: `1px solid ${color}30`,
 }}>
-<div className="text-[9px] tracking-[0.15em] text-stone-400 mb-0.5">{label}</div>
+<div className="text-[9px] tracking-[0.15em] text-mil-fade mb-0.5">{label}</div>
 <div className="text-2xl font-bold leading-none" style={{ color, textShadow: `0 0 12px ${color}66` }}>{value}</div>
 </div>
 );
@@ -1717,35 +1717,35 @@ function AbilityCard({ ability }) {
 const teach = useTeach();
 const isCooldown = ability.type === 'cooldown';
 const isKeyword = ability.type === 'keyword' || ability.type === 'named';
-const accent = isCooldown ? '#fde047' : isKeyword ? '#fde047' : '#94a3b8';
+const accent = isCooldown ? '#cc2200' : isKeyword ? '#cc2200' : '#94a3b8';
 
 return (
 <div className="rounded-lg p-3 border" style={{
-background: 'rgba(0,0,0,0.3)',
-borderColor: isCooldown ? 'rgba(253,224,71,0.25)' : 'rgba(255,255,255,0.06)',
+background: 'rgba(0,0,0,0.65)',
+borderColor: isCooldown ? 'rgba(204,34,0,0.25)' : 'rgba(255,255,255,0.06)',
 borderLeftWidth: '3px',
 borderLeftColor: accent,
 }}>
 {isCooldown && (
 <div className="flex items-baseline gap-1.5 mb-1">
-<span className="text-yellow-300 text-xs font-bold tracking-wider">↺ {ability.cost}</span>
-<span className="text-stone-600">:</span>
-<button onClick={() => teach.showKeyword(ability.name)} className="text-yellow-300 text-xs font-bold tracking-wider hover:text-yellow-200 hover:underline">
+<span className="text-mil-red text-xs font-bold tracking-wider">↺ {ability.cost}</span>
+<span className="text-mil-ghost/70">:</span>
+<button onClick={() => teach.showKeyword(ability.name)} className="text-mil-red text-xs font-bold tracking-wider hover:text-mil-paper hover:underline">
 {ability.name}
 </button>
 </div>
 )}
 {isKeyword && ability.name && (
 <div className="mb-1">
-<button onClick={() => teach.showKeyword(ability.name)} className="text-yellow-300 text-xs font-bold tracking-wider hover:text-yellow-200 hover:underline">
+<button onClick={() => teach.showKeyword(ability.name)} className="text-mil-red text-xs font-bold tracking-wider hover:text-mil-paper hover:underline">
 {ability.name}
 </button>
 </div>
 )}
 {!isCooldown && !isKeyword && (
-<div className="text-stone-500 text-xs mb-1">★ PASSIVE</div>
+<div className="text-mil-ghost text-xs mb-1">★ PASSIVE</div>
 )}
-<p className="text-sm text-stone-100 leading-relaxed"><TeachableText text={ability.text || ''} /></p>
+<p className="text-sm text-mil-paper leading-relaxed"><TeachableText text={ability.text || ''} /></p>
 </div>
 );
 }
@@ -1774,7 +1774,7 @@ parts = next;
 return (
 <>
 {parts.map((p, i) => p.kw ? (
-<button key={i} onClick={() => teach.showKeyword(p.kw)} className="text-yellow-300 font-bold hover:text-yellow-200 hover:underline transition">
+<button key={i} onClick={() => teach.showKeyword(p.kw)} className="text-mil-red font-bold hover:text-mil-paper hover:underline transition">
 {p.kw}
 </button>
 ) : (
@@ -1802,25 +1802,25 @@ const sections = [
 
 return (
 <>
-<header className="sticky top-0 z-30 border-b border-stone-800 bg-stone-950/95 backdrop-blur">
+<header className="sticky top-0 z-30 border-b border-mil-border bg-stone-950/95 backdrop-blur">
 <div className="px-4 py-3">
 <div className="flex items-center justify-between mb-3">
 <div className="flex items-center gap-2">
-<BookOpen className="h-3.5 w-3.5 text-yellow-300" />
-<h1 className="text-xs tracking-[0.3em] text-stone-300 uppercase">Rules · v{RULES.version}</h1>
+<BookOpen className="h-3.5 w-3.5 text-mil-red" />
+<h1 className="text-xs tracking-[0.3em] text-mil-stone uppercase">Rules · v{RULES.version}</h1>
 </div>
-<span className="text-[10px] text-stone-500 tracking-wider">{RULES.lastupdate}</span>
+<span className="text-[10px] text-mil-ghost tracking-wider">{RULES.lastupdate}</span>
 </div>
 <div className="relative">
-<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-500" />
+<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mil-ghost" />
 <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="search.rules_"
-className="w-full bg-stone-900 border border-stone-800 pl-10 pr-3 py-2 text-sm text-stone-100 placeholder:text-stone-600 focus:border-yellow-400 focus:outline-none transition" />
+className="w-full bg-mil-panel border border-mil-border pl-10 pr-3 py-2 text-sm text-mil-paper placeholder:text-mil-ghost/70 focus:border-mil-red focus:outline-none transition" />
 </div>
 <div className="flex gap-1 mt-2 overflow-x-auto pb-1">
 {sections.map(s => (
 <button key={s.key} onClick={() => setSection(s.key)}
-className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${section === s.key ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>
-{s.label} {s.count !== null && <span className="text-stone-600 ml-1">{s.count}</span>}
+className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${section === s.key ? 'border-mil-red text-mil-red bg-mil-red/10' : 'border-mil-border text-mil-fade'}`}>
+{s.label} {s.count !== null && <span className="text-mil-ghost/70 ml-1">{s.count}</span>}
 </button>
 ))}
 </div>
@@ -1844,7 +1844,7 @@ if (!search) return true;
 const q = search.toLowerCase();
 return k.name.toLowerCase().includes(q) || (k.text || '').toLowerCase().includes(q) || (k.detail || '').toLowerCase().includes(q);
 });
-if (filtered.length === 0) return <div className="text-stone-500 text-sm text-center py-12">no keywords match.</div>;
+if (filtered.length === 0) return <div className="text-mil-ghost text-sm text-center py-12">no keywords match.</div>;
 return (
 <div className="space-y-2">
 {filtered.map(k => <KeywordCard key={k.name} kw={k} />)}
@@ -1855,20 +1855,20 @@ return (
 function KeywordCard({ kw }) {
 const [open, setOpen] = useState(false);
 return (
-<div className="border border-stone-800 bg-stone-900/40">
-<button onClick={() => setOpen(o => !o)} className="w-full text-left px-3 py-2 hover:bg-stone-900 transition">
+<div className="border border-mil-border bg-mil-panel/60">
+<button onClick={() => setOpen(o => !o)} className="w-full text-left px-3 py-2 hover:bg-mil-panel transition">
 <div className="flex items-start justify-between gap-3">
 <div className="flex-1 min-w-0">
-<div className="text-yellow-300 text-xs font-bold tracking-wider">{kw.name}</div>
-{kw.text && <div className="text-sm text-stone-200 mt-0.5">{kw.text}</div>}
+<div className="text-mil-red text-xs font-bold tracking-wider">{kw.name}</div>
+{kw.text && <div className="text-sm text-mil-stone mt-0.5">{kw.text}</div>}
 </div>
-{kw.detail && <ChevronRight className={`h-3.5 w-3.5 text-stone-600 mt-1 flex-shrink-0 transition ${open ? 'rotate-90' : ''}`} />}
+{kw.detail && <ChevronRight className={`h-3.5 w-3.5 text-mil-ghost/70 mt-1 flex-shrink-0 transition ${open ? 'rotate-90' : ''}`} />}
 </div>
 </button>
 {open && kw.detail && (
-<div className="border-t border-stone-800 px-3 py-2 bg-stone-950/50">
-<div className="text-[10px] tracking-wider text-stone-500 mb-1">// DETAIL</div>
-<div className="text-xs text-stone-300 leading-relaxed">{kw.detail}</div>
+<div className="border-t border-mil-border px-3 py-2 bg-stone-950/50">
+<div className="text-[10px] tracking-wider text-mil-ghost mb-1">// DETAIL</div>
+<div className="text-xs text-mil-stone leading-relaxed">{kw.detail}</div>
 </div>
 )}
 </div>
@@ -1881,13 +1881,13 @@ if (!search) return true;
 const q = search.toLowerCase();
 return i.name.toLowerCase().includes(q) || (i.text || '').toLowerCase().includes(q);
 });
-if (filtered.length === 0) return <div className="text-stone-500 text-sm text-center py-12">no entries match.</div>;
+if (filtered.length === 0) return <div className="text-mil-ghost text-sm text-center py-12">no entries match.</div>;
 return (
 <div className="space-y-2">
 {filtered.map(i => (
-<div key={i.name} className="border border-stone-800 bg-stone-900/40 px-3 py-2">
-<div className="text-yellow-300 text-xs font-bold tracking-wider">{i.name.toUpperCase()}</div>
-<div className="text-sm text-stone-200 mt-0.5 leading-relaxed">{i.text}</div>
+<div key={i.name} className="border border-mil-border bg-mil-panel/60 px-3 py-2">
+<div className="text-mil-red text-xs font-bold tracking-wider">{i.name.toUpperCase()}</div>
+<div className="text-sm text-mil-stone mt-0.5 leading-relaxed">{i.text}</div>
 </div>
 ))}
 </div>
@@ -1898,51 +1898,51 @@ function DeckRules() {
 const r = RULES.deckRules;
 return (
 <div className="space-y-3">
-<div className="border border-stone-800 bg-stone-900/40 p-4">
-  <div className="text-yellow-300 text-xs font-bold tracking-wider mb-3">STANDARD DECK</div>
+<div className="border border-mil-border bg-mil-panel/60 p-4">
+  <div className="text-mil-red text-xs font-bold tracking-wider mb-3">STANDARD DECK</div>
   <div className="grid grid-cols-2 gap-3">
     <Stat label="TOTAL" value={r.totalCards} />
     <Stat label="LEADER" value={r.leaders} />
     <Stat label="TERRITORIES" value={r.territories} />
     <Stat label="ARSENAL" value={r.arsenal} />
   </div>
-  <div className="mt-3 text-xs text-stone-300 space-y-1">
+  <div className="mt-3 text-xs text-mil-stone space-y-1">
     <div>• Exactly 1 Leader card</div>
-    <div>• Exactly 4 Territory cards — each must be <span className="text-yellow-300 font-bold">unique</span> (1 copy max per Territory)</div>
+    <div>• Exactly 4 Territory cards — each must be <span className="text-mil-red font-bold">unique</span> (1 copy max per Territory)</div>
     <div>• Exactly 60 Arsenal cards</div>
     <div>• Max {r.maxCopies} copies of any same-named arsenal card</div>
   </div>
 </div>
-<div className="border border-stone-800 bg-stone-900/40 p-4">
-  <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">ARSENAL CARD TYPES</div>
-  <div className="text-xs text-stone-300 leading-relaxed space-y-1">
-    <div>Arsenal slots may contain: <span className="text-stone-100">Force, G Force, Building, WMD, Weather, Morale, and Intel</span> cards.</div>
-    <div className="text-stone-500">Leader and Territory cards are <span className="text-rose-300">not</span> part of the arsenal and do not count toward the 60-card limit.</div>
-    <div className="text-stone-500 mt-1">G Force cards are a premium Force variant. Upgrade and Resource cards may appear in some sets as additional arsenal types.</div>
+<div className="border border-mil-border bg-mil-panel/60 p-4">
+  <div className="text-mil-red text-xs font-bold tracking-wider mb-2">ARSENAL CARD TYPES</div>
+  <div className="text-xs text-mil-stone leading-relaxed space-y-1">
+    <div>Arsenal slots may contain: <span className="text-mil-paper">Force, G Force, Building, WMD, Weather, Morale, and Intel</span> cards.</div>
+    <div className="text-mil-ghost">Leader and Territory cards are <span className="text-rose-300">not</span> part of the arsenal and do not count toward the 60-card limit.</div>
+    <div className="text-mil-ghost mt-1">G Force cards are a premium Force variant. Upgrade and Resource cards may appear in some sets as additional arsenal types.</div>
   </div>
 </div>
 <div className="border border-sky-800/40 bg-sky-900/10 p-4">
   <div className="text-sky-300 text-xs font-bold tracking-wider mb-2">BLITZ MODE</div>
-  <div className="text-xs text-stone-300 leading-relaxed space-y-1">
+  <div className="text-xs text-mil-stone leading-relaxed space-y-1">
     <div>A faster 1v1 format using the same 65-card deck structure. The goal is to eliminate your opponent's Leader directly — but you must first eliminate their Territories or deck before targeting the Leader.</div>
-    <div className="text-stone-500">Blitz is designed as an easy-to-learn entry point. Free pre-made decks are available to new players.</div>
+    <div className="text-mil-ghost">Blitz is designed as an easy-to-learn entry point. Free pre-made decks are available to new players.</div>
   </div>
 </div>
 <div className="border border-violet-800/40 bg-violet-900/10 p-4">
   <div className="text-violet-300 text-xs font-bold tracking-wider mb-2">CABAL MODE (SOLO)</div>
-  <div className="text-xs text-stone-300 leading-relaxed">
+  <div className="text-xs text-mil-stone leading-relaxed">
     A solo mode where a single player completes missions by playing against the Cabal — the game's AI opponent. Ideal for deck testing and learning card combinations without needing an opponent.
   </div>
 </div>
-<div className="border border-stone-800 bg-stone-900/40 p-4">
-  <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">WIN CONDITION</div>
-  <div className="text-xs text-stone-300 leading-relaxed">
+<div className="border border-mil-border bg-mil-panel/60 p-4">
+  <div className="text-mil-red text-xs font-bold tracking-wider mb-2">WIN CONDITION</div>
+  <div className="text-xs text-mil-stone leading-relaxed">
     The last player with a standing Leader wins. A Leader becomes <span className="text-rose-300 font-bold">Compromised</span> when their Morale reaches 0. A Compromised Leader that is eliminated ends the game.
   </div>
 </div>
-<div className="border border-stone-700/50 bg-stone-900/20 p-3 mt-1">
-  <div className="text-[10px] text-stone-500 leading-relaxed">
-    Deck rules sourced from <span className="text-yellow-300/70">rules.warsaken.com</span> (v{RULES.version}, {RULES.lastupdate}). Warsaken® is a trademark of Eclectic Nerds LLC. Always check the official rules site for the latest updates.
+<div className="border border-mil-border/50 bg-stone-900/20 p-3 mt-1">
+  <div className="text-[10px] text-mil-ghost leading-relaxed">
+    Deck rules sourced from <span className="text-mil-red/70">rules.warsaken.com</span> (v{RULES.version}, {RULES.lastupdate}). Warsaken® is a trademark of Eclectic Nerds LLC. Always check the official rules site for the latest updates.
   </div>
 </div>
 </div>
@@ -1951,9 +1951,9 @@ return (
 
 function Stat({ label, value }) {
 return (
-<div className="border border-stone-800 bg-stone-950 px-3 py-2">
-<div className="text-[10px] tracking-wider text-stone-500">{label}</div>
-<div className="text-2xl font-bold text-yellow-300 leading-tight">{value}</div>
+<div className="border border-mil-border bg-mil-deeper px-3 py-2">
+<div className="text-[10px] tracking-wider text-mil-ghost">{label}</div>
+<div className="text-2xl font-bold text-mil-red leading-tight">{value}</div>
 </div>
 );
 }
@@ -1975,12 +1975,12 @@ const links = [
 ];
 return (
 <div className="space-y-4">
-  <div className="border border-yellow-500/30 bg-yellow-500/5 p-4">
-    <div className="text-[10px] tracking-[0.2em] text-yellow-300/80 mb-2">// WARSAKEN®</div>
-    <div className="text-sm font-bold text-stone-100 mb-3">Created by Brandon Adams · Eclectic Nerds LLC</div>
-    <div className="text-xs text-stone-300 leading-relaxed space-y-2">
+  <div className="border border-mil-red/30 bg-mil-red/5 p-4">
+    <div className="text-[10px] tracking-[0.2em] text-mil-red/80 mb-2">// WARSAKEN®</div>
+    <div className="text-sm font-bold text-mil-paper mb-3">Created by Brandon Adams · Eclectic Nerds LLC</div>
+    <div className="text-xs text-mil-stone leading-relaxed space-y-2">
       <p>
-        Warsaken® is a modern military-themed deck construction card game designed by Brandon Adams, who first conceived it at age 17 as a way to connect with his father — a US Army veteran. After revisiting the idea in 2018, he founded <span className="text-yellow-300">Eclectic Nerds LLC</span> and launched Warsaken commercially in 2021.
+        Warsaken® is a modern military-themed deck construction card game designed by Brandon Adams, who first conceived it at age 17 as a way to connect with his father — a US Army veteran. After revisiting the idea in 2018, he founded <span className="text-mil-red">Eclectic Nerds LLC</span> and launched Warsaken commercially in 2021.
       </p>
       <p>
         The game features artists from around the world and is published physically and digitally on the WAX blockchain.
@@ -1988,46 +1988,46 @@ return (
     </div>
   </div>
 
-  <div className="border border-stone-800 bg-stone-900/40 p-4">
-    <div className="text-yellow-300 text-xs font-bold tracking-wider mb-3">OFFICIAL LINKS</div>
+  <div className="border border-mil-border bg-mil-panel/60 p-4">
+    <div className="text-mil-red text-xs font-bold tracking-wider mb-3">OFFICIAL LINKS</div>
     <div className="space-y-2">
       {links.map(l => (
         <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer"
-          className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-white/5 transition group">
-          <span className="text-xs text-stone-200 group-hover:text-yellow-300 transition">{l.label}</span>
-          <span className="text-[10px] text-stone-500 group-hover:text-stone-300 transition font-mono">{l.sub}</span>
+          className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-mil-muted/30 transition group">
+          <span className="text-xs text-mil-stone group-hover:text-mil-red transition">{l.label}</span>
+          <span className="text-[10px] text-mil-ghost group-hover:text-mil-stone transition font-mono">{l.sub}</span>
         </a>
       ))}
     </div>
   </div>
 
-  <div className="border border-stone-800 bg-stone-900/40 p-4">
-    <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">ABOUT THIS COMPANION</div>
-    <div className="text-xs text-stone-300 leading-relaxed space-y-2">
+  <div className="border border-mil-border bg-mil-panel/60 p-4">
+    <div className="text-mil-red text-xs font-bold tracking-wider mb-2">ABOUT THIS COMPANION</div>
+    <div className="text-xs text-mil-stone leading-relaxed space-y-2">
       <p>
-        This is an <span className="text-yellow-300 font-bold">unofficial, fan-made companion app</span> built by <span className="text-yellow-300">TheoryofShadows</span> to help players learn Warsaken faster and build better decks.
+        This is an <span className="text-mil-red font-bold">unofficial, fan-made companion app</span> built by <span className="text-mil-red">TheoryofShadows</span> to help players learn Warsaken faster and build better decks.
       </p>
       <p>
-        It is not affiliated with or endorsed by Eclectic Nerds LLC or EN Digital LLC. All card names, artwork, rules text, game terms, and the Warsaken® trademark are property of <span className="text-yellow-300">Eclectic Nerds LLC</span>.
+        It is not affiliated with or endorsed by Eclectic Nerds LLC or EN Digital LLC. All card names, artwork, rules text, game terms, and the Warsaken® trademark are property of <span className="text-mil-red">Eclectic Nerds LLC</span>.
       </p>
       <p>
-        Card data is sourced from the WAX blockchain (AtomicAssets, collection: <span className="font-mono text-stone-400">warsaken</span>) and official rules from <span className="font-mono text-stone-400">rules.warsaken.com</span>. Deck recipes are authored by the Warsaken game creators and sourced from <span className="font-mono text-stone-400">rules.warsaken.com/decks</span>.
+        Card data is sourced from the WAX blockchain (AtomicAssets, collection: <span className="font-mono text-mil-fade">warsaken</span>) and official rules from <span className="font-mono text-mil-fade">rules.warsaken.com</span>. Deck recipes are authored by the Warsaken game creators and sourced from <span className="font-mono text-mil-fade">rules.warsaken.com/decks</span>.
       </p>
     </div>
   </div>
 
-  <div className="border border-stone-800 bg-stone-900/40 p-4">
-    <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">HOW THE AI BUILDERS WORK</div>
-    <div className="text-xs text-stone-300 leading-relaxed space-y-2">
-      <p><span className="text-yellow-200 font-bold">RECIPE</span> — Loads official deck templates authored by the Warsaken creators from rules.warsaken.com. Cards are resolved from the enriched card pool using type and subtype matching as a fallback when exact IDs aren't available.</p>
-      <p><span className="text-yellow-200 font-bold">NOVEL</span> — Builds an original deck from scratch. Reads your chosen leader's abilities to detect themes, then scores every card in the enriched pool using keyword synergy, cost curve, stat efficiency, and leader-text affinity. Every card pick shows its reasoning.</p>
-      <p><span className="text-yellow-200 font-bold">COUNTER-META</span> — Adversarial builder. Predicts the target leader's likely deck by aggregating their official recipes plus a novel composition, then builds your deck to specifically counter it using keyword counter-edges, force-type denial (ANTI-AIR / ANTI-GROUND / ANTI-NAVAL), and archetype disruption.</p>
-      <p className="text-stone-500">All three builders run entirely in your browser — no server, no API key required. The card pool currently has <span className="text-stone-400">{ENRICHED.length} cards with full OCR data</span> out of {CARDS.length} total — only leaders in the enriched set are available for Novel and Counter modes. Recipe mode works for all {CARDS.length} cards.</p>
+  <div className="border border-mil-border bg-mil-panel/60 p-4">
+    <div className="text-mil-red text-xs font-bold tracking-wider mb-2">HOW THE AI BUILDERS WORK</div>
+    <div className="text-xs text-mil-stone leading-relaxed space-y-2">
+      <p><span className="text-mil-paper font-bold">RECIPE</span> — Loads official deck templates authored by the Warsaken creators from rules.warsaken.com. Cards are resolved from the enriched card pool using type and subtype matching as a fallback when exact IDs aren't available.</p>
+      <p><span className="text-mil-paper font-bold">NOVEL</span> — Builds an original deck from scratch. Reads your chosen leader's abilities to detect themes, then scores every card in the enriched pool using keyword synergy, cost curve, stat efficiency, and leader-text affinity. Every card pick shows its reasoning.</p>
+      <p><span className="text-mil-paper font-bold">COUNTER-META</span> — Adversarial builder. Predicts the target leader's likely deck by aggregating their official recipes plus a novel composition, then builds your deck to specifically counter it using keyword counter-edges, force-type denial (ANTI-AIR / ANTI-GROUND / ANTI-NAVAL), and archetype disruption.</p>
+      <p className="text-mil-ghost">All three builders run entirely in your browser — no server, no API key required. The card pool currently has <span className="text-mil-fade">{ENRICHED.length} cards with full OCR data</span> out of {CARDS.length} total — only leaders in the enriched set are available for Novel and Counter modes. Recipe mode works for all {CARDS.length} cards.</p>
     </div>
   </div>
 
-  <div className="border border-stone-700/40 p-3">
-    <div className="text-[10px] text-stone-600 leading-relaxed text-center">
+  <div className="border border-mil-border/40 p-3">
+    <div className="text-[10px] text-mil-ghost/70 leading-relaxed text-center">
       Warsaken® is a registered trademark of Eclectic Nerds LLC. All rights reserved.<br />
       This companion app is a fan project and is not officially affiliated with Eclectic Nerds LLC.
     </div>
@@ -2145,13 +2145,13 @@ if (confirm('Delete this deck permanently?')) deleteDeck(id);
 
 return (
 <>
-<header className="sticky top-0 z-30 border-b border-stone-800 bg-stone-950/95 backdrop-blur">
+<header className="sticky top-0 z-30 border-b border-mil-border bg-stone-950/95 backdrop-blur">
 <div className="px-4 py-3">
 <div className="flex items-center justify-between mb-2">
-<button onClick={() => setShowManager(s => !s)} className="flex items-center gap-2 min-w-0 flex-1 hover:text-yellow-300 transition">
-<Layers className="h-3.5 w-3.5 text-yellow-300 flex-shrink-0" />
-<span className="text-xs tracking-[0.2em] text-stone-300 uppercase truncate">{activeDeck?.name || 'Untitled Deck'}</span>
-<ChevronRight className={`h-3 w-3 text-stone-500 transition-transform ${showManager ? 'rotate-90' : ''}`} />
+<button onClick={() => setShowManager(s => !s)} className="flex items-center gap-2 min-w-0 flex-1 hover:text-mil-red transition">
+<Layers className="h-3.5 w-3.5 text-mil-red flex-shrink-0" />
+<span className="text-xs tracking-[0.2em] text-mil-stone uppercase truncate">{activeDeck?.name || 'Untitled Deck'}</span>
+<ChevronRight className={`h-3 w-3 text-mil-ghost transition-transform ${showManager ? 'rotate-90' : ''}`} />
 </button>
 <div className="flex items-center gap-2 flex-shrink-0">
 {validation.valid ? (
@@ -2159,62 +2159,62 @@ return (
 ) : (
 <span className="flex items-center gap-1 text-[10px] tracking-wider text-rose-400"><AlertTriangle className="h-3 w-3" /> {validation.issues.length}</span>
 )}
-<button onClick={handleShareLink} disabled={validation.total === 0} className="text-stone-500 hover:text-yellow-300 disabled:opacity-30 transition" title="Copy share link">
+<button onClick={handleShareLink} disabled={validation.total === 0} className="text-mil-ghost hover:text-mil-red disabled:opacity-30 transition" title="Copy share link">
 <Share2 className="h-3.5 w-3.5" />
 </button>
-<button onClick={handleExport} disabled={validation.total === 0} className="text-stone-500 hover:text-yellow-300 disabled:opacity-30 transition" title="Export deck text">
+<button onClick={handleExport} disabled={validation.total === 0} className="text-mil-ghost hover:text-mil-red disabled:opacity-30 transition" title="Export deck text">
 <ExternalLink className="h-3.5 w-3.5" />
 </button>
-<button onClick={clearDeck} disabled={validation.total === 0} className="text-stone-500 hover:text-rose-400 disabled:opacity-30 transition" title="Clear deck">
+<button onClick={clearDeck} disabled={validation.total === 0} className="text-mil-ghost hover:text-rose-400 disabled:opacity-30 transition" title="Clear deck">
 <Trash2 className="h-3.5 w-3.5" />
 </button>
 </div>
 </div>
-<div className="flex items-center gap-3 text-xs text-stone-400">
-<span><span className="text-stone-100 font-bold">{validation.total}</span><span className="text-stone-600">/65</span></span>
-<div className="h-3 w-px bg-stone-800" />
-<span>L: <span className="text-stone-100">{validation.byType['Leader']||0}</span></span>
-<span>T: <span className="text-stone-100">{validation.byType['Territory']||0}</span></span>
-<span>A: <span className="text-stone-100">{validation.total - (validation.byType['Leader']||0) - (validation.byType['Territory']||0)}</span></span>
+<div className="flex items-center gap-3 text-xs text-mil-fade">
+<span><span className="text-mil-paper font-bold">{validation.total}</span><span className="text-mil-ghost/70">/65</span></span>
+<div className="h-3 w-px bg-mil-muted" />
+<span>L: <span className="text-mil-paper">{validation.byType['Leader']||0}</span></span>
+<span>T: <span className="text-mil-paper">{validation.byType['Territory']||0}</span></span>
+<span>A: <span className="text-mil-paper">{validation.total - (validation.byType['Leader']||0) - (validation.byType['Territory']||0)}</span></span>
 </div>
 <div className="flex gap-1 mt-2 flex-wrap">
-<button onClick={() => setSection('list')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'list' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>LIST</button>
-<button onClick={() => setSection('analysis')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'analysis' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>ANALYSIS</button>
-<button onClick={() => setSection('practice')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'practice' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>PRACTICE</button>
-<button onClick={() => setSection('issues')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'issues' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>
+<button onClick={() => setSection('list')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'list' ? 'border-mil-red text-mil-red bg-mil-red/10' : 'border-mil-border text-mil-fade'}`}>LIST</button>
+<button onClick={() => setSection('analysis')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'analysis' ? 'border-mil-red text-mil-red bg-mil-red/10' : 'border-mil-border text-mil-fade'}`}>ANALYSIS</button>
+<button onClick={() => setSection('practice')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'practice' ? 'border-mil-red text-mil-red bg-mil-red/10' : 'border-mil-border text-mil-fade'}`}>PRACTICE</button>
+<button onClick={() => setSection('issues')} className={`text-[11px] px-2.5 py-1 border transition ${section === 'issues' ? 'border-mil-red text-mil-red bg-mil-red/10' : 'border-mil-border text-mil-fade'}`}>
 ISSUES {validation.issues.length > 0 && <span className="ml-1 text-rose-400">{validation.issues.length}</span>}
 </button>
 </div>
 </div>
 
     {showManager && (
-      <div className="border-t border-stone-800 bg-stone-900/80 px-4 py-3 space-y-2">
+      <div className="border-t border-mil-border bg-stone-900/80 px-4 py-3 space-y-2">
         <div className="flex items-center gap-2">
-          <button onClick={handleNewDeck} className="flex-1 text-[11px] px-2 py-1.5 border border-yellow-400/40 text-yellow-300 bg-yellow-400/10 hover:bg-yellow-400/20 transition tracking-wider">
+          <button onClick={handleNewDeck} className="flex-1 text-[11px] px-2 py-1.5 border border-mil-red/40 text-mil-red bg-mil-red/10 hover:bg-mil-red/20 transition tracking-wider">
             <Plus className="h-3 w-3 inline -mt-0.5 mr-1" />NEW DECK
           </button>
-          <button onClick={() => setShowImport(s => !s)} className="flex-1 text-[11px] px-2 py-1.5 border border-stone-700 text-stone-300 hover:border-yellow-400 hover:text-yellow-300 transition tracking-wider">
+          <button onClick={() => setShowImport(s => !s)} className="flex-1 text-[11px] px-2 py-1.5 border border-mil-green text-mil-stone hover:border-mil-red hover:text-mil-red transition tracking-wider">
             IMPORT
           </button>
           {activeDeckId && (
-            <button onClick={handleRename} className="flex-1 text-[11px] px-2 py-1.5 border border-stone-700 text-stone-300 hover:border-yellow-400 hover:text-yellow-300 transition tracking-wider">
+            <button onClick={handleRename} className="flex-1 text-[11px] px-2 py-1.5 border border-mil-green text-mil-stone hover:border-mil-red hover:text-mil-red transition tracking-wider">
               RENAME
             </button>
           )}
         </div>
 
         {showImport && (
-          <div className="space-y-2 pt-2 border-t border-stone-800">
-            <div className="text-[10px] text-stone-500 tracking-wider">PASTE DECK TEXT (1x 001-000 NAME format)</div>
+          <div className="space-y-2 pt-2 border-t border-mil-border">
+            <div className="text-[10px] text-mil-ghost tracking-wider">PASTE DECK TEXT (1x 001-000 NAME format)</div>
             <textarea value={importText} onChange={(e) => setImportText(e.target.value)} rows={5}
               placeholder="# Deck Name&#10;1x 001-000 Roman Volkov, the Exile&#10;1x 001-009 Wolf Power District&#10;..."
-              className="w-full bg-stone-950 border border-stone-800 px-2 py-1.5 text-xs text-stone-100 placeholder:text-stone-700 focus:border-yellow-400 focus:outline-none transition font-mono resize-none" />
+              className="w-full bg-mil-deeper border border-mil-border px-2 py-1.5 text-xs text-mil-paper placeholder:text-stone-700 focus:border-mil-red focus:outline-none transition font-mono resize-none" />
             {importError && <div className="text-[10px] text-rose-400">{importError}</div>}
             <div className="flex gap-2">
-              <button onClick={handleImport} disabled={!importText.trim()} className="flex-1 text-[11px] py-1.5 border border-yellow-400 text-yellow-300 bg-yellow-400/10 hover:bg-yellow-400/20 disabled:opacity-30 transition tracking-wider">
+              <button onClick={handleImport} disabled={!importText.trim()} className="flex-1 text-[11px] py-1.5 border border-mil-red text-mil-red bg-mil-red/10 hover:bg-mil-red/20 disabled:opacity-30 transition tracking-wider">
                 IMPORT DECK
               </button>
-              <button onClick={() => { setShowImport(false); setImportText(''); setImportError(null); }} className="flex-1 text-[11px] py-1.5 border border-stone-700 text-stone-400 hover:text-stone-200 transition tracking-wider">
+              <button onClick={() => { setShowImport(false); setImportText(''); setImportError(null); }} className="flex-1 text-[11px] py-1.5 border border-mil-green text-mil-fade hover:text-mil-stone transition tracking-wider">
                 CANCEL
               </button>
             </div>
@@ -2222,18 +2222,18 @@ ISSUES {validation.issues.length > 0 && <span className="ml-1 text-rose-400">{va
         )}
 
         {allDeckList.length > 0 && (
-          <div className="space-y-1 pt-2 border-t border-stone-800">
-            <div className="text-[10px] text-stone-500 tracking-wider">SAVED DECKS ({allDeckList.length})</div>
+          <div className="space-y-1 pt-2 border-t border-mil-border">
+            <div className="text-[10px] text-mil-ghost tracking-wider">SAVED DECKS ({allDeckList.length})</div>
             {allDeckList.map(d => {
               const total = Object.values(d.cards || {}).reduce((s,n) => s+n, 0);
               const isActive = d.id === activeDeckId;
               return (
-                <div key={d.id} className={`flex items-center gap-2 border px-2 py-1.5 transition ${isActive ? 'border-yellow-400 bg-yellow-400/10' : 'border-stone-800 hover:border-stone-700'}`}>
+                <div key={d.id} className={`flex items-center gap-2 border px-2 py-1.5 transition ${isActive ? 'border-mil-red bg-mil-red/10' : 'border-mil-border hover:border-mil-green'}`}>
                   <button onClick={() => { setActiveDeckId(d.id); setShowManager(false); }} className="flex-1 text-left min-w-0">
-                    <div className="text-xs text-stone-100 truncate">{d.name}</div>
-                    <div className="text-[10px] text-stone-500">{total}/65 cards</div>
+                    <div className="text-xs text-mil-paper truncate">{d.name}</div>
+                    <div className="text-[10px] text-mil-ghost">{total}/65 cards</div>
                   </button>
-                  <button onClick={() => handleDelete(d.id)} className="text-stone-600 hover:text-rose-400 transition" title="Delete">
+                  <button onClick={() => handleDelete(d.id)} className="text-mil-ghost/70 hover:text-rose-400 transition" title="Delete">
                     <Trash2 className="h-3 w-3" />
                   </button>
                 </div>
@@ -2243,10 +2243,10 @@ ISSUES {validation.issues.length > 0 && <span className="ml-1 text-rose-400">{va
         )}
 
         {!storageReady && (
-          <div className="text-[10px] text-stone-500 italic">Loading saved decks...</div>
+          <div className="text-[10px] text-mil-ghost italic">Loading saved decks...</div>
         )}
         {storageReady && allDeckList.length === 0 && (
-          <div className="text-[10px] text-stone-500 italic">No saved decks yet. Decks are auto-saved as you build.</div>
+          <div className="text-[10px] text-mil-ghost italic">No saved decks yet. Decks are auto-saved as you build.</div>
         )}
       </div>
     )}
@@ -2255,9 +2255,9 @@ ISSUES {validation.issues.length > 0 && <span className="ml-1 text-rose-400">{va
     {validation.total === 0 ? (
       <div className="py-20 text-center">
         <Layers className="h-10 w-10 mx-auto text-stone-700 mb-3" />
-        <p className="text-sm text-stone-400">no cards in deck.</p>
-        <p className="text-xs text-stone-600 mt-1 tracking-wider">USE THE CARDS TAB TO ADD CARDS</p>
-        <p className="text-xs text-stone-600 mt-3 tracking-wider">OR TRY THE AI BUILDER</p>
+        <p className="text-sm text-mil-fade">no cards in deck.</p>
+        <p className="text-xs text-mil-ghost/70 mt-1 tracking-wider">USE THE CARDS TAB TO ADD CARDS</p>
+        <p className="text-xs text-mil-ghost/70 mt-3 tracking-wider">OR TRY THE AI BUILDER</p>
       </div>
     ) : section === 'list' ? (
       <DeckList entries={sortedEntries} onInc={inc} onDec={dec} onRemove={removeAll} />
@@ -2292,21 +2292,21 @@ return (
 <div className="flex items-center gap-2 mb-2 px-1">
 <Icon className="h-3.5 w-3.5" style={{ color: meta.color }} />
 <span className="text-[10px] tracking-[0.2em] font-bold" style={{ color: meta.color }}>{type.toUpperCase()}</span>
-<span className="text-[10px] text-stone-600">×{total}</span>
+<span className="text-[10px] text-mil-ghost/70">×{total}</span>
 </div>
 <div className="space-y-1">
 {items.map(e => (
-<div key={e.card.id} className="flex items-center gap-2 border border-stone-800 bg-stone-900/40 px-3 py-2">
+<div key={e.card.id} className="flex items-center gap-2 border border-mil-border bg-mil-panel/60 px-3 py-2">
 <div className="flex-1 min-w-0">
-<div className="text-sm text-stone-100 truncate">{e.card.name}</div>
-<div className="text-[10px] text-stone-500">{e.card.id} · {e.card.rarity}</div>
+<div className="text-sm text-mil-paper truncate">{e.card.name}</div>
+<div className="text-[10px] text-mil-ghost">{e.card.id} · {e.card.rarity}</div>
 </div>
 <div className="flex items-center gap-0">
-<button onClick={() => onDec(e.card.id)} className="px-2 text-stone-500 hover:text-rose-400 transition"><Minus className="h-3.5 w-3.5" /></button>
-<span className="text-yellow-300 font-bold w-6 text-center text-sm">{e.n}</span>
-<button onClick={() => onInc(e.card.id)} className="px-2 text-stone-500 hover:text-yellow-300 transition"><Plus className="h-3.5 w-3.5" /></button>
+<button onClick={() => onDec(e.card.id)} className="px-2 text-mil-ghost hover:text-rose-400 transition"><Minus className="h-3.5 w-3.5" /></button>
+<span className="text-mil-red font-bold w-6 text-center text-sm">{e.n}</span>
+<button onClick={() => onInc(e.card.id)} className="px-2 text-mil-ghost hover:text-mil-red transition"><Plus className="h-3.5 w-3.5" /></button>
 </div>
-<button onClick={() => onRemove(e.card.id)} className="text-stone-600 hover:text-rose-400 transition ml-1"><Trash2 className="h-3.5 w-3.5" /></button>
+<button onClick={() => onRemove(e.card.id)} className="text-mil-ghost/70 hover:text-rose-400 transition ml-1"><Trash2 className="h-3.5 w-3.5" /></button>
 </div>
 ))}
 </div>
@@ -2334,7 +2334,7 @@ aggro:    { color: '#fb7185', label: 'AGGRO',    desc: 'Pressure-focused — fas
 control:  { color: '#7dd3fc', label: 'CONTROL',  desc: 'Removal-heavy — locks/stuns/eliminates threats while grinding to a long-game win.' },
 tempo:    { color: '#c084fc', label: 'TEMPO',    desc: 'Card-advantage — draw engines + cheap plays compound into a dominant position.' },
 ramp:     { color: '#86efac', label: 'RAMP',     desc: 'Build-up — heavier curve banking on big resource production for late-game payoffs.' },
-midrange: { color: '#fde047', label: 'MIDRANGE', desc: 'Balanced — no single dominant axis; flexible and reactive.' },
+midrange: { color: '#cc2200', label: 'MIDRANGE', desc: 'Balanced — no single dominant axis; flexible and reactive.' },
 };
 const archMeta = ARCH_META[analysis.archetype];
 
@@ -2348,18 +2348,18 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
 }}>
 <div className="text-[10px] tracking-[0.2em] mb-1" style={{ color: archMeta.color }}>// DECK ARCHETYPE</div>
 <div className="text-2xl font-bold mb-1.5" style={{ color: archMeta.color }}>{archMeta.label}</div>
-<div className="text-xs text-stone-300 leading-relaxed mb-3">{archMeta.desc}</div>
+<div className="text-xs text-mil-stone leading-relaxed mb-3">{archMeta.desc}</div>
 {analysis.themes.length > 0 && (
 <div className="flex flex-wrap gap-1.5">
 {analysis.themes.map(t => (
-<span key={t} className="text-[10px] tracking-wider px-2 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', color: '#e7e5e4' }}>{t.toUpperCase()}</span>
+<span key={t} className="text-[10px] tracking-wider px-2 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.1)', color: '#e7e5e4' }}>{t.toUpperCase()}</span>
 ))}
 </div>
 )}
 <div className="grid grid-cols-4 gap-1.5 mt-3">
 {Object.entries(analysis.archetypeScores).map(([k, v]) => (
-<div key={k} className="text-center rounded p-1.5" style={{ background: 'rgba(0,0,0,0.4)', border: k === analysis.archetype ? `1px solid ${archMeta.color}` : '1px solid rgba(255,255,255,0.05)' }}>
-<div className="text-[8px] tracking-wider text-stone-400">{k.toUpperCase()}</div>
+<div key={k} className="text-center rounded p-1.5" style={{ background: 'rgba(0,0,0,0.6)', border: k === analysis.archetype ? `1px solid ${archMeta.color}` : '1px solid rgba(255,255,255,0.05)' }}>
+<div className="text-[8px] tracking-wider text-mil-fade">{k.toUpperCase()}</div>
 <div className="text-sm font-bold" style={{ color: k === analysis.archetype ? archMeta.color : '#a8a29e' }}>{v}</div>
 </div>
 ))}
@@ -2368,17 +2368,17 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
 
   {/* Synergy density */}
   {Object.keys(analysis.keywordCounts).length > 0 && (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="flex items-center gap-2 mb-2">
-        <Network className="h-3.5 w-3.5 text-yellow-300" />
-        <div className="text-xs font-bold text-yellow-200 tracking-wider">SYNERGY DENSITY · TAP TO LEARN</div>
+        <Network className="h-3.5 w-3.5 text-mil-red" />
+        <div className="text-xs font-bold text-mil-paper tracking-wider">SYNERGY DENSITY · TAP TO LEARN</div>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {Object.entries(analysis.keywordCounts).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([kw, n]) => (
           <button key={kw} onClick={() => teach.showKeyword(kw)} className="text-[11px] px-2 py-1 rounded-md transition" style={{
-            background: 'rgba(253,224,71,0.1)', border: '1px solid rgba(253,224,71,0.3)', color: '#fde047',
+            background: 'rgba(204,34,0,0.1)', border: '1px solid rgba(204,34,0,0.3)', color: '#cc2200',
           }}>
-            {kw} <span className="text-yellow-400/70 font-bold ml-1">×{n}</span>
+            {kw} <span className="text-mil-red/70 font-bold ml-1">×{n}</span>
           </button>
         ))}
       </div>
@@ -2387,7 +2387,7 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
 
   {/* Active synergies (documented edges that fire in this deck) */}
   {analysis.activeSynergies.length > 0 && (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(192,132,252,0.2)' }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(192,132,252,0.2)' }}>
       <div className="flex items-center gap-2 mb-3">
         <GitBranch className="h-3.5 w-3.5 text-purple-300" />
         <div className="text-xs font-bold text-purple-200 tracking-wider">ACTIVE SYNERGIES</div>
@@ -2397,7 +2397,7 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
           <div key={i} className="flex items-center justify-between text-[11px] gap-2">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
               <button onClick={() => teach.showKeyword(s.pair[0])} className="text-purple-200 hover:text-white truncate transition">{s.pair[0]}</button>
-              <span className="text-stone-600 flex-shrink-0">×</span>
+              <span className="text-mil-ghost/70 flex-shrink-0">×</span>
               <button onClick={() => teach.showKeyword(s.pair[1])} className="text-purple-200 hover:text-white truncate transition">{s.pair[1]}</button>
             </div>
             <span className="text-purple-300 font-mono font-bold flex-shrink-0">{s.aCount}/{s.bCount}</span>
@@ -2409,10 +2409,10 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
 
   {/* Cost curve */}
   {Object.keys(analysis.costCurve).length > 0 && (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="flex items-center gap-2 mb-3">
-        <TrendingUp className="h-3.5 w-3.5 text-yellow-300" />
-        <div className="text-xs font-bold text-yellow-200 tracking-wider">COST CURVE</div>
+        <TrendingUp className="h-3.5 w-3.5 text-mil-red" />
+        <div className="text-xs font-bold text-mil-paper tracking-wider">COST CURVE</div>
       </div>
       <div className="space-y-2">
         {[0, 1, 2, 3, 4].map(c => {
@@ -2421,11 +2421,11 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
           return (
             <div key={c}>
               <div className="flex justify-between text-[11px] mb-1">
-                <span className="text-stone-300 font-mono">↺ {c}{c === 4 ? '+' : ''}</span>
-                <span className="text-stone-400">{n} cards</span>
+                <span className="text-mil-stone font-mono">↺ {c}{c === 4 ? '+' : ''}</span>
+                <span className="text-mil-fade">{n} cards</span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                <div className="h-full rounded-full transition-all" style={{ width: `${(n / cMax) * 100}%`, background: 'linear-gradient(90deg, #fde047, #fb923c)', boxShadow: '0 0 8px rgba(253,224,71,0.4)' }} />
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.65)' }}>
+                <div className="h-full rounded-full transition-all" style={{ width: `${(n / cMax) * 100}%`, background: 'linear-gradient(90deg, #cc2200, #fb923c)', boxShadow: '0 0 8px rgba(204,34,0,0.4)' }} />
               </div>
             </div>
           );
@@ -2436,7 +2436,7 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
 
   {/* Predicted matchups (based on counter coverage of opposing recipes) */}
   {analysis.matchups.length > 0 && (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(251,113,133,0.2)' }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(251,113,133,0.2)' }}>
       <div className="flex items-center gap-2 mb-3">
         <Crosshair className="h-3.5 w-3.5 text-rose-300" />
         <div className="text-xs font-bold text-rose-200 tracking-wider">PREDICTED MATCHUPS · COUNTER COVERAGE</div>
@@ -2444,21 +2444,21 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
       <div className="space-y-1.5">
         {analysis.matchups.slice(0, 8).map(m => {
           const pct = Math.round(m.score * 100);
-          const color = m.score >= 0.5 ? '#86efac' : m.score >= 0.25 ? '#fde047' : '#fb7185';
+          const color = m.score >= 0.5 ? '#86efac' : m.score >= 0.25 ? '#cc2200' : '#fb7185';
           return (
             <div key={m.leader.id} className="text-[11px]">
               <div className="flex items-center justify-between mb-1 gap-2">
-                <span className="text-stone-200 truncate flex-1">vs {m.leader.name}</span>
+                <span className="text-mil-stone truncate flex-1">vs {m.leader.name}</span>
                 <span className="font-mono font-bold flex-shrink-0" style={{ color }}>{pct}%</span>
               </div>
-              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.65)' }}>
                 <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
               </div>
             </div>
           );
         })}
       </div>
-      <div className="text-[10px] text-stone-500 mt-3 leading-relaxed">
+      <div className="text-[10px] text-mil-ghost mt-3 leading-relaxed">
         Score = % of opposing leader's predicted threat keywords your deck has at least one explicit counter for. Based on their official recipes.
       </div>
     </div>
@@ -2466,16 +2466,16 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
 
   {/* Force-type composition */}
   {(analysis.forceTypes.Ground + analysis.forceTypes.Air + analysis.forceTypes.Navy) > 0 && (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="flex items-center gap-2 mb-3">
-        <Shield className="h-3.5 w-3.5 text-yellow-300" />
-        <div className="text-xs font-bold text-yellow-200 tracking-wider">FORCE COMPOSITION</div>
+        <Shield className="h-3.5 w-3.5 text-mil-red" />
+        <div className="text-xs font-bold text-mil-paper tracking-wider">FORCE COMPOSITION</div>
       </div>
       <div className="grid grid-cols-3 gap-2">
         {['Ground', 'Air', 'Navy'].map(t => (
-          <div key={t} className="text-center rounded-lg p-2" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div className="text-[9px] tracking-[0.2em] text-stone-400">{t.toUpperCase()}</div>
-            <div className="text-base font-bold mt-1 text-stone-100">{analysis.forceTypes[t]}</div>
+          <div key={t} className="text-center rounded-lg p-2" style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className="text-[9px] tracking-[0.2em] text-mil-fade">{t.toUpperCase()}</div>
+            <div className="text-base font-bold mt-1 text-mil-paper">{analysis.forceTypes[t]}</div>
           </div>
         ))}
       </div>
@@ -2483,18 +2483,18 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
   )}
 
   {/* Type / set / rarity (preserved from old analysis) */}
-  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-    <div className="text-xs font-bold text-yellow-200 tracking-wider mb-3">TYPE DISTRIBUTION</div>
+  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="text-xs font-bold text-mil-paper tracking-wider mb-3">TYPE DISTRIBUTION</div>
     <div className="space-y-2">
       {types.map(([t, n]) => {
         const meta = TYPE_META[t] || { color: '#9ca3af' };
         return (
           <div key={t}>
             <div className="flex justify-between text-xs mb-0.5">
-              <span className="text-stone-300">{t}</span>
-              <span className="text-stone-500">{n}</span>
+              <span className="text-mil-stone">{t}</span>
+              <span className="text-mil-ghost">{n}</span>
             </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.65)' }}>
               <div className="h-full rounded-full" style={{ width: `${(n / max) * 100}%`, backgroundColor: meta.color }} />
             </div>
           </div>
@@ -2510,7 +2510,7 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
         <AlertTriangle className="h-3.5 w-3.5 text-rose-300" />
         <div className="text-xs font-bold text-rose-200 tracking-wider">DETECTED WEAKNESSES</div>
       </div>
-      <div className="space-y-1.5 text-xs text-stone-300">
+      <div className="space-y-1.5 text-xs text-mil-stone">
         {analysis.weaknesses.map((w, i) => (<div key={i} className="leading-relaxed">{w}</div>))}
       </div>
     </div>
@@ -2582,10 +2582,10 @@ turn: t, p: cardDrawProbability(deck, probCardId, 8 + (t - 1), 1),
 
 if (validation.total < 10) {
 return (
-<div className="rounded-xl p-6 text-center" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+<div className="rounded-xl p-6 text-center" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
 <Activity className="h-10 w-10 mx-auto text-stone-700 mb-3" />
-<p className="text-sm text-stone-400">Practice mode needs at least 10 cards in deck.</p>
-<p className="text-xs text-stone-600 mt-1 tracking-wider">CURRENTLY {validation.total}</p>
+<p className="text-sm text-mil-fade">Practice mode needs at least 10 cards in deck.</p>
+<p className="text-xs text-mil-ghost/70 mt-1 tracking-wider">CURRENTLY {validation.total}</p>
 </div>
 );
 }
@@ -2594,16 +2594,16 @@ return (
 <div className="space-y-4">
 {/* Header / arsenal stats */}
 <div className="rounded-xl p-4 relative overflow-hidden" style={{
-background: 'linear-gradient(135deg, rgba(192,132,252,0.08), rgba(20,20,24,0.7))',
+background: 'linear-gradient(135deg, rgba(192,132,252,0.08), rgba(13,26,15,0.8))',
 border: '1px solid rgba(192,132,252,0.25)',
 }}>
 <div className="text-[10px] tracking-[0.2em] text-purple-300/80 mb-1">// PRACTICE · GOLDFISH MODE</div>
-<div className="text-sm text-stone-200 leading-relaxed">
+<div className="text-sm text-mil-stone leading-relaxed">
 Shuffle your arsenal and draw an opening hand. Mulligan to re-draw. Tap any card in the arsenal below to see <span className="text-purple-300 font-bold">hypergeometric draw probabilities</span> turn-by-turn.
 </div>
 <div className="grid grid-cols-3 gap-2 mt-3">
 <StatBox label="ARSENAL" value={arsenalSize} color="#c084fc" />
-<StatBox label="DRAWN" value={drawnCount} color="#fde047" />
+<StatBox label="DRAWN" value={drawnCount} color="#cc2200" />
 <StatBox label="LEFT" value={Math.max(0, arsenalSize - drawnCount)} color="#86efac" />
 </div>
 </div>
@@ -2619,19 +2619,19 @@ Shuffle your arsenal and draw an opening hand. Mulligan to re-draw. Tap any card
     </button>
   ) : (
     <div className="space-y-3">
-      <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(192,132,252,0.2)' }}>
+      <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(192,132,252,0.2)' }}>
         <div className="flex items-center justify-between mb-2">
           <div className="text-xs font-bold text-purple-200 tracking-wider">YOUR HAND ({hand.length})</div>
-          <div className="text-[10px] text-stone-500 tracking-wider">SHUFFLE #{seed}</div>
+          <div className="text-[10px] text-mil-ghost tracking-wider">SHUFFLE #{seed}</div>
         </div>
         <div className="space-y-1">
           {hand.map((c, i) => {
             const meta = TYPE_META[c.type] || { color: '#9ca3af' };
             return (
-              <button key={`${c.id}-${i}`} onClick={() => teach.showCard(c.id)} className="w-full flex items-center gap-2 text-xs py-1.5 px-2 rounded hover:bg-white/5 transition text-left">
+              <button key={`${c.id}-${i}`} onClick={() => teach.showCard(c.id)} className="w-full flex items-center gap-2 text-xs py-1.5 px-2 rounded hover:bg-mil-muted/30 transition text-left">
                 <span className="text-[9px] font-bold tracking-wider w-12 flex-shrink-0" style={{ color: meta.color }}>{c.type.slice(0, 4).toUpperCase()}</span>
-                <span className="text-stone-100 flex-1 truncate">{c.name}</span>
-                {typeof c.cost === 'number' && <span className="text-[10px] text-stone-500 font-mono flex-shrink-0">↺{c.cost}</span>}
+                <span className="text-mil-paper flex-1 truncate">{c.name}</span>
+                {typeof c.cost === 'number' && <span className="text-[10px] text-mil-ghost font-mono flex-shrink-0">↺{c.cost}</span>}
                 {c.hasFullData && <span className="text-[8px] text-emerald-400 tracking-wider flex-shrink-0">DATA</span>}
               </button>
             );
@@ -2642,35 +2642,35 @@ Shuffle your arsenal and draw an opening hand. Mulligan to re-draw. Tap any card
         <button onClick={mulligan} className="py-2.5 rounded-lg text-xs font-bold tracking-wider text-purple-200 hover:text-white transition" style={{
           background: 'rgba(192,132,252,0.1)', border: '1px solid rgba(192,132,252,0.4)',
         }}>MULLIGAN</button>
-        <button onClick={drawNext} disabled={drawnCount >= arsenalSize} className="py-2.5 rounded-lg text-xs font-bold tracking-wider text-yellow-200 hover:text-white transition disabled:opacity-30" style={{
-          background: 'rgba(253,224,71,0.1)', border: '1px solid rgba(253,224,71,0.4)',
+        <button onClick={drawNext} disabled={drawnCount >= arsenalSize} className="py-2.5 rounded-lg text-xs font-bold tracking-wider text-mil-paper hover:text-white transition disabled:opacity-30" style={{
+          background: 'rgba(204,34,0,0.1)', border: '1px solid rgba(204,34,0,0.4)',
         }}>DRAW +1</button>
-        <button onClick={reset} className="py-2.5 rounded-lg text-xs font-bold tracking-wider text-stone-400 hover:text-stone-200 transition" style={{
-          background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)',
+        <button onClick={reset} className="py-2.5 rounded-lg text-xs font-bold tracking-wider text-mil-fade hover:text-mil-stone transition" style={{
+          background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.08)',
         }}>RESET</button>
       </div>
     </div>
   )}
 
   {/* Probability calculator */}
-  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(125,211,252,0.2)' }}>
+  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(125,211,252,0.2)' }}>
     <div className="flex items-center gap-2 mb-3">
       <Activity className="h-3.5 w-3.5 text-sky-300" />
       <div className="text-xs font-bold text-sky-200 tracking-wider">DRAW PROBABILITY · HYPERGEOMETRIC</div>
     </div>
-    <div className="text-[10px] text-stone-500 mb-3 leading-relaxed">
+    <div className="text-[10px] text-mil-ghost mb-3 leading-relaxed">
       P(see ≥1 copy of selected card by turn N), accounting for opening hand of 8 + 1 draw per turn from a {arsenalSize}-card arsenal.
     </div>
-    <div className="text-[10px] tracking-[0.2em] text-stone-400 mb-2">// PICK A CARD</div>
+    <div className="text-[10px] tracking-[0.2em] text-mil-fade mb-2">// PICK A CARD</div>
     <div className="max-h-44 overflow-y-auto space-y-1 mb-3 pr-1">
       {arsenalCards.slice(0, 30).map(({ card: c, n }) => {
         const meta = TYPE_META[c.type] || { color: '#9ca3af' };
         const active = probCardId === c.id;
         return (
-          <button key={c.id} onClick={() => setProbCardId(c.id)} className={`w-full flex items-center gap-2 text-xs py-1.5 px-2 rounded transition text-left ${active ? 'bg-sky-500/15' : 'hover:bg-white/5'}`} style={active ? { border: '1px solid rgba(125,211,252,0.5)' } : { border: '1px solid transparent' }}>
+          <button key={c.id} onClick={() => setProbCardId(c.id)} className={`w-full flex items-center gap-2 text-xs py-1.5 px-2 rounded transition text-left ${active ? 'bg-sky-500/15' : 'hover:bg-mil-muted/30'}`} style={active ? { border: '1px solid rgba(125,211,252,0.5)' } : { border: '1px solid transparent' }}>
             <span className="text-[9px] font-bold tracking-wider w-12 flex-shrink-0" style={{ color: meta.color }}>{c.type.slice(0, 4).toUpperCase()}</span>
-            <span className="text-stone-100 flex-1 truncate">{c.name}</span>
-            <span className="text-yellow-300 font-mono font-bold w-7 text-right">×{n}</span>
+            <span className="text-mil-paper flex-1 truncate">{c.name}</span>
+            <span className="text-mil-red font-mono font-bold w-7 text-right">×{n}</span>
           </button>
         );
       })}
@@ -2681,14 +2681,14 @@ Shuffle your arsenal and draw an opening hand. Mulligan to re-draw. Tap any card
         <div className="space-y-1.5">
           {probCurve.map(p => {
             const pct = Math.round(p.p * 100);
-            const color = p.p >= 0.75 ? '#86efac' : p.p >= 0.5 ? '#fde047' : p.p >= 0.25 ? '#fb923c' : '#fb7185';
+            const color = p.p >= 0.75 ? '#86efac' : p.p >= 0.5 ? '#cc2200' : p.p >= 0.25 ? '#fb923c' : '#fb7185';
             return (
               <div key={p.turn}>
                 <div className="flex justify-between text-[11px] mb-1">
-                  <span className="text-stone-400 font-mono">turn {p.turn}</span>
+                  <span className="text-mil-fade font-mono">turn {p.turn}</span>
                   <span style={{ color }} className="font-mono font-bold">{pct}%</span>
                 </div>
-                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.65)' }}>
                   <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
                 </div>
               </div>
@@ -2709,7 +2709,7 @@ return (
 <div className="border border-green-500/30 bg-green-500/5 p-4 text-center">
 <CheckCircle2 className="h-8 w-8 mx-auto text-green-400 mb-2" />
 <div className="text-sm text-green-300 font-bold tracking-wider">DECK IS LEGAL</div>
-<div className="text-xs text-stone-400 mt-1">All structural rules satisfied for Standard format.</div>
+<div className="text-xs text-mil-fade mt-1">All structural rules satisfied for Standard format.</div>
 </div>
 );
 }
@@ -2718,7 +2718,7 @@ return (
 {issues.map((iss, i) => (
 <div key={i} className="border border-rose-500/30 bg-rose-500/5 p-3 flex items-start gap-2">
 <AlertTriangle className="h-4 w-4 text-rose-400 flex-shrink-0 mt-0.5" />
-<div className="text-sm text-stone-200">{iss.msg}</div>
+<div className="text-sm text-mil-stone">{iss.msg}</div>
 </div>
 ))}
 </div>
@@ -2936,31 +2936,31 @@ setCounterResult(null);
 return (
 <>
 <header className="sticky top-0 z-30 border-b border-white/[0.06]" style={{
-background: 'linear-gradient(180deg, rgba(20,20,24,0.92) 0%, rgba(15,15,18,0.98) 100%)',
+background: 'linear-gradient(180deg, rgba(8,15,10,0.94) 0%, rgba(8,15,10,0.99) 100%)',
 backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
 }}>
 <div className="px-4 py-3">
 <div className="flex items-center justify-between mb-3">
 <div className="flex items-center gap-2">
-<div className="h-7 w-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(253,224,71,0.15)', boxShadow: '0 0 16px rgba(253,224,71,0.3)' }}>
-<Sparkles className="h-3.5 w-3.5 text-yellow-300" />
+<div className="h-7 w-7 rounded-full flex items-center justify-center" style={{ background: 'rgba(204,34,0,0.15)', boxShadow: '0 0 16px rgba(204,34,0,0.3)' }}>
+<Sparkles className="h-3.5 w-3.5 text-mil-red" />
 </div>
-<h1 className="text-xs tracking-[0.25em] text-yellow-100/90 uppercase font-semibold">AI Deck Builder</h1>
+<h1 className="text-xs tracking-[0.25em] text-mil-paper uppercase font-semibold">AI Deck Builder</h1>
 </div>
-<span className="text-[10px] text-stone-500 tracking-wider">{ENRICHED.length} ENRICHED · {RECIPES.length} RECIPES</span>
+<span className="text-[10px] text-mil-ghost tracking-wider">{ENRICHED.length} ENRICHED · {RECIPES.length} RECIPES</span>
 </div>
 {/* Mode toggle */}
-<div className="grid grid-cols-3 gap-1 p-1 rounded-lg" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)' }}>
-<button onClick={() => { setMode('recipe'); reset(); }} className={`text-[11px] py-2 rounded-md tracking-wider font-bold transition flex items-center justify-center gap-1.5 ${mode === 'recipe' ? 'text-yellow-200' : 'text-stone-400 hover:text-stone-200'}`}
-style={mode === 'recipe' ? { background: 'linear-gradient(180deg, rgba(253,224,71,0.15), rgba(253,224,71,0.05))', boxShadow: '0 0 16px rgba(253,224,71,0.15), inset 0 1px 0 rgba(255,255,255,0.05)' } : {}}>
+<div className="grid grid-cols-3 gap-1 p-1 rounded-lg" style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.06)' }}>
+<button onClick={() => { setMode('recipe'); reset(); }} className={`text-[11px] py-2 rounded-md tracking-wider font-bold transition flex items-center justify-center gap-1.5 ${mode === 'recipe' ? 'text-mil-paper' : 'text-mil-fade hover:text-mil-stone'}`}
+style={mode === 'recipe' ? { background: 'linear-gradient(180deg, rgba(204,34,0,0.15), rgba(204,34,0,0.05))', boxShadow: '0 0 16px rgba(204,34,0,0.15), inset 0 1px 0 rgba(58,107,39,0.15)' } : {}}>
 <Award className="h-3.5 w-3.5" /> RECIPE
 </button>
-<button onClick={() => { setMode('novel'); reset(); }} className={`text-[11px] py-2 rounded-md tracking-wider font-bold transition flex items-center justify-center gap-1.5 ${mode === 'novel' ? 'text-yellow-200' : 'text-stone-400 hover:text-stone-200'}`}
-style={mode === 'novel' ? { background: 'linear-gradient(180deg, rgba(253,224,71,0.15), rgba(253,224,71,0.05))', boxShadow: '0 0 16px rgba(253,224,71,0.15), inset 0 1px 0 rgba(255,255,255,0.05)' } : {}}>
+<button onClick={() => { setMode('novel'); reset(); }} className={`text-[11px] py-2 rounded-md tracking-wider font-bold transition flex items-center justify-center gap-1.5 ${mode === 'novel' ? 'text-mil-paper' : 'text-mil-fade hover:text-mil-stone'}`}
+style={mode === 'novel' ? { background: 'linear-gradient(180deg, rgba(204,34,0,0.15), rgba(204,34,0,0.05))', boxShadow: '0 0 16px rgba(204,34,0,0.15), inset 0 1px 0 rgba(58,107,39,0.15)' } : {}}>
 <Brain className="h-3.5 w-3.5" /> NOVEL
 </button>
-<button onClick={() => { setMode('counter'); reset(); }} className={`text-[11px] py-2 rounded-md tracking-wider font-bold transition flex items-center justify-center gap-1.5 ${mode === 'counter' ? 'text-rose-200' : 'text-stone-400 hover:text-stone-200'}`}
-style={mode === 'counter' ? { background: 'linear-gradient(180deg, rgba(251,113,133,0.18), rgba(251,113,133,0.05))', boxShadow: '0 0 16px rgba(251,113,133,0.2), inset 0 1px 0 rgba(255,255,255,0.05)' } : {}}>
+<button onClick={() => { setMode('counter'); reset(); }} className={`text-[11px] py-2 rounded-md tracking-wider font-bold transition flex items-center justify-center gap-1.5 ${mode === 'counter' ? 'text-rose-200' : 'text-mil-fade hover:text-mil-stone'}`}
+style={mode === 'counter' ? { background: 'linear-gradient(180deg, rgba(251,113,133,0.18), rgba(251,113,133,0.05))', boxShadow: '0 0 16px rgba(251,113,133,0.2), inset 0 1px 0 rgba(58,107,39,0.15)' } : {}}>
 <Crosshair className="h-3.5 w-3.5" /> COUNTER
 </button>
 </div>
@@ -3010,9 +3010,9 @@ const teach = useTeach();
 if (selectedRecipe && building) {
 return (
 <div className="py-20 text-center">
-<Loader2 className="h-10 w-10 mx-auto text-yellow-400 animate-spin mb-3" style={{ filter: 'drop-shadow(0 0 16px rgba(253,224,71,0.5))' }} />
-<div className="text-sm text-yellow-200 tracking-wider mt-3 font-bold">RESOLVING RECIPE...</div>
-<div className="text-xs text-stone-500 mt-1">Loading "{selectedRecipe.title}"</div>
+<Loader2 className="h-10 w-10 mx-auto text-mil-redbright animate-spin mb-3" style={{ filter: 'drop-shadow(0 0 16px rgba(204,34,0,0.5))' }} />
+<div className="text-sm text-mil-paper tracking-wider mt-3 font-bold">RESOLVING RECIPE...</div>
+<div className="text-xs text-mil-ghost mt-1">Loading "{selectedRecipe.title}"</div>
 </div>
 );
 }
@@ -3020,29 +3020,29 @@ return (
 if (resolved && selectedRecipe) {
 return (
 <div className="space-y-4">
-<button onClick={backToRecipes} className="text-xs text-stone-400 hover:text-yellow-300 flex items-center gap-1 transition">← BACK TO RECIPES</button>
+<button onClick={backToRecipes} className="text-xs text-mil-fade hover:text-mil-red flex items-center gap-1 transition">← BACK TO RECIPES</button>
 
     <div className="rounded-xl p-4 relative overflow-hidden" style={{
-      background: 'linear-gradient(135deg, rgba(253,224,71,0.12), rgba(20,20,24,0.8))',
-      border: '1px solid rgba(253,224,71,0.3)',
+      background: 'linear-gradient(135deg, rgba(204,34,0,0.12), rgba(13,26,15,0.85))',
+      border: '1px solid rgba(204,34,0,0.3)',
     }}>
-      <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(253,224,71,0.6), transparent)' }} />
-      <div className="text-[10px] tracking-[0.2em] text-yellow-300/80 mb-1">// OFFICIAL RECIPE</div>
+      <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(204,34,0,0.6), transparent)' }} />
+      <div className="text-[10px] tracking-[0.2em] text-mil-red/80 mb-1">// OFFICIAL RECIPE</div>
       <div className="text-xl font-bold text-white mb-2">{selectedRecipe.title}</div>
       <div className="flex flex-wrap gap-1.5 mb-3">
         {selectedRecipe.themes.map(t => (
-          <span key={t} className="text-[11px] tracking-wider px-2 py-0.5 rounded-md" style={{ background: 'rgba(253,224,71,0.12)', border: '1px solid rgba(253,224,71,0.3)', color: '#fde047' }}>{t}</span>
+          <span key={t} className="text-[11px] tracking-wider px-2 py-0.5 rounded-md" style={{ background: 'rgba(204,34,0,0.12)', border: '1px solid rgba(204,34,0,0.3)', color: '#cc2200' }}>{t}</span>
         ))}
       </div>
-      <div className="text-[10px] tracking-wider text-stone-400">
-        {selectedRecipe.mode} · <span className="text-yellow-300 font-bold">{resolved.total}</span> CARDS
+      <div className="text-[10px] tracking-wider text-mil-fade">
+        {selectedRecipe.mode} · <span className="text-mil-red font-bold">{resolved.total}</span> CARDS
         {' · '}<span className="text-emerald-400">{resolved.choices.filter(c => c.kind === 'fixed').length}</span> FIXED
         {' · '}<span className="text-sky-400">{resolved.choices.filter(c => c.kind === 'filter').length}</span> AI-PICKED
       </div>
     </div>
 
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="text-xs font-bold text-yellow-200 tracking-wider mb-3">DECK COMPOSITION</div>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="text-xs font-bold text-mil-paper tracking-wider mb-3">DECK COMPOSITION</div>
       <div className="space-y-2">
         {Object.entries(resolved.byType).sort((a,b) => b[1]-a[1]).map(([type, n]) => {
           const meta = TYPE_META[type] || { color: '#9ca3af' };
@@ -3050,10 +3050,10 @@ return (
           return (
             <div key={type}>
               <div className="flex justify-between text-[11px] mb-1">
-                <span className="text-stone-300">{type}</span>
-                <span className="text-stone-500">{n}</span>
+                <span className="text-mil-stone">{type}</span>
+                <span className="text-mil-ghost">{n}</span>
               </div>
-              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.65)' }}>
                 <div className="h-full rounded-full" style={{ width: `${(n/max)*100}%`, background: meta.color, boxShadow: `0 0 8px ${meta.glow || 'rgba(0,0,0,0)'}` }} />
               </div>
             </div>
@@ -3062,8 +3062,8 @@ return (
       </div>
     </div>
 
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="text-xs font-bold text-yellow-200 tracking-wider mb-3">CARDS · TAP FOR DETAILS</div>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="text-xs font-bold text-mil-paper tracking-wider mb-3">CARDS · TAP FOR DETAILS</div>
       <div className="space-y-1 max-h-96 overflow-y-auto">
         {resolved.entries
           .sort((a,b) => {
@@ -3075,11 +3075,11 @@ return (
           .map(e => {
             const meta = TYPE_META[e.card.type] || { color: '#9ca3af' };
             return (
-              <button key={e.card.id} onClick={() => teach.showCard(e.card.id)} className="w-full flex items-center gap-2 text-xs py-1.5 px-2 rounded hover:bg-white/5 transition text-left">
+              <button key={e.card.id} onClick={() => teach.showCard(e.card.id)} className="w-full flex items-center gap-2 text-xs py-1.5 px-2 rounded hover:bg-mil-muted/30 transition text-left">
                 <span className="text-[9px] font-bold tracking-wider w-12 flex-shrink-0" style={{ color: meta.color }}>{e.card.type.slice(0,4).toUpperCase()}</span>
-                <span className="text-stone-100 flex-1 truncate">{e.card.name}</span>
+                <span className="text-mil-paper flex-1 truncate">{e.card.name}</span>
                 {e.card.hasFullData && <span className="text-[8px] text-emerald-400 tracking-wider">DATA</span>}
-                <span className="text-yellow-300 font-bold w-7 text-right">×{e.n}</span>
+                <span className="text-mil-red font-bold w-7 text-right">×{e.n}</span>
               </button>
             );
           })
@@ -3087,10 +3087,10 @@ return (
       </div>
     </div>
 
-    <button onClick={loadIntoDeckBuilder} className="w-full py-4 rounded-xl text-yellow-200 hover:text-white transition flex items-center justify-center gap-2 font-bold tracking-wider sticky bottom-20" style={{
-      background: 'linear-gradient(135deg, rgba(253,224,71,0.25), rgba(253,224,71,0.08))',
-      border: '1px solid rgba(253,224,71,0.5)',
-      boxShadow: '0 8px 32px rgba(253,224,71,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+    <button onClick={loadIntoDeckBuilder} className="w-full py-4 rounded-xl text-mil-paper hover:text-white transition flex items-center justify-center gap-2 font-bold tracking-wider sticky bottom-20" style={{
+      background: 'linear-gradient(135deg, rgba(204,34,0,0.25), rgba(204,34,0,0.08))',
+      border: '1px solid rgba(204,34,0,0.5)',
+      boxShadow: '0 8px 32px rgba(204,34,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
     }}>
       <Layers className="h-4 w-4" /> SAVE AS NEW DECK
     </button>
@@ -3102,35 +3102,35 @@ return (
 if (selectedLeaderId) {
 return (
 <div className="space-y-3">
-<button onClick={reset} className="text-xs text-stone-400 hover:text-yellow-300 flex items-center gap-1 transition">← BACK TO LEADERS</button>
-<div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+<button onClick={reset} className="text-xs text-mil-fade hover:text-mil-red flex items-center gap-1 transition">← BACK TO LEADERS</button>
+<div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
 <div className="flex items-center gap-3">
-<div className="h-10 w-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(253,224,71,0.12)' }}>
-<Crown className="h-5 w-5 text-yellow-300" />
+<div className="h-10 w-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(204,34,0,0.12)' }}>
+<Crown className="h-5 w-5 text-mil-red" />
 </div>
 <div>
 <div className="text-base text-white font-medium">{getCard(selectedLeaderId)?.name}</div>
-<div className="text-[10px] text-stone-500 tracking-wider">CHOOSE A DECK STRATEGY</div>
+<div className="text-[10px] text-mil-ghost tracking-wider">CHOOSE A DECK STRATEGY</div>
 </div>
 </div>
 </div>
 <div className="space-y-2">
 {recipesForLeader.map(r => (
 <button key={r.title} onClick={() => pickRecipe(r)} className="w-full text-left rounded-xl overflow-hidden transition group" style={{
-background: 'linear-gradient(135deg, rgba(253,224,71,0.04), rgba(20,20,24,0.6))',
+background: 'linear-gradient(135deg, rgba(253,224,71,0.04), rgba(13,26,15,0.7))',
 border: '1px solid rgba(255,255,255,0.06)',
 }}>
 <div className="p-3 flex items-start justify-between gap-2">
 <div className="flex-1 min-w-0">
 <div className="text-sm text-white font-medium">{r.title}</div>
-<div className="text-[10px] text-stone-500 tracking-wider mt-0.5">{r.mode.toUpperCase()} · {r.cards.length} SLOTS</div>
+<div className="text-[10px] text-mil-ghost tracking-wider mt-0.5">{r.mode.toUpperCase()} · {r.cards.length} SLOTS</div>
 <div className="flex flex-wrap gap-1 mt-2">
 {r.themes.map(t => (
-<span key={t} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(253,224,71,0.1)', border: '1px solid rgba(253,224,71,0.25)', color: '#fde047' }}>{t}</span>
+<span key={t} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(204,34,0,0.1)', border: '1px solid rgba(204,34,0,0.25)', color: '#cc2200' }}>{t}</span>
 ))}
 </div>
 </div>
-<ArrowRight className="h-4 w-4 text-stone-500 group-hover:text-yellow-300 group-hover:translate-x-0.5 transition mt-1" />
+<ArrowRight className="h-4 w-4 text-mil-ghost group-hover:text-mil-red group-hover:translate-x-0.5 transition mt-1" />
 </div>
 </button>
 ))}
@@ -3143,37 +3143,37 @@ border: '1px solid rgba(255,255,255,0.06)',
 return (
 <div className="space-y-3">
 <div className="rounded-xl p-4 relative overflow-hidden" style={{
-background: 'linear-gradient(135deg, rgba(253,224,71,0.06), rgba(20,20,24,0.6))',
-border: '1px solid rgba(253,224,71,0.2)',
+background: 'linear-gradient(135deg, rgba(204,34,0,0.06), rgba(13,26,15,0.7))',
+border: '1px solid rgba(204,34,0,0.2)',
 }}>
 <div className="flex items-start gap-2">
-<Award className="h-4 w-4 text-yellow-300 flex-shrink-0 mt-0.5" />
-<div className="text-xs text-stone-200 leading-relaxed">
-<span className="font-bold text-yellow-200">OFFICIAL RECIPES. </span>
-{RECIPES.length} deck templates authored by the Warsaken creators (Eclectic Nerds LLC) and sourced from rules.warsaken.com. Each recipe specifies exact cards or flexible slots by type — we resolve every slot from the {ENRICHED.length}-card enriched pool using type and subtype matching as fallback. Recipes are labelled <span className="text-sky-300 font-bold">Blitz</span> (fast 1v1) or <span className="text-yellow-300 font-bold">Standard</span> (full game).ype matching as fallback.
+<Award className="h-4 w-4 text-mil-red flex-shrink-0 mt-0.5" />
+<div className="text-xs text-mil-stone leading-relaxed">
+<span className="font-bold text-mil-paper">OFFICIAL RECIPES. </span>
+{RECIPES.length} deck templates authored by the Warsaken creators (Eclectic Nerds LLC) and sourced from rules.warsaken.com. Each recipe specifies exact cards or flexible slots by type — we resolve every slot from the {ENRICHED.length}-card enriched pool using type and subtype matching as fallback. Recipes are labelled <span className="text-sky-300 font-bold">Blitz</span> (fast 1v1) or <span className="text-mil-red font-bold">Standard</span> (full game).ype matching as fallback.
 </div>
 </div>
 </div>
 
-  <div className="text-[10px] tracking-[0.2em] text-stone-400">// CHOOSE A LEADER ({recipeLeaders.length})</div>
+  <div className="text-[10px] tracking-[0.2em] text-mil-fade">// CHOOSE A LEADER ({recipeLeaders.length})</div>
   <div className="space-y-2">
     {recipeLeaders.map(l => {
       const rs = getRecipesForLeader(l.id);
       return (
         <button key={l.id} onClick={() => setSelectedLeaderId(l.id)} className="w-full text-left rounded-xl overflow-hidden transition group" style={{
-          background: 'linear-gradient(135deg, rgba(253,224,71,0.05), rgba(20,20,24,0.6))',
+          background: 'linear-gradient(135deg, rgba(204,34,0,0.05), rgba(13,26,15,0.7))',
           border: '1px solid rgba(255,255,255,0.06)',
         }}>
           <div className="p-3 flex items-start gap-3">
-            <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(253,224,71,0.1)' }}>
-              <Crown className="h-5 w-5 text-yellow-300" />
+            <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(204,34,0,0.1)' }}>
+              <Crown className="h-5 w-5 text-mil-red" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm text-white font-medium truncate">{l.name}</div>
-              <div className="text-[10px] text-stone-500 tracking-wider mt-0.5">{l.id} · {rs.length} OFFICIAL RECIPE{rs.length === 1 ? '' : 'S'}</div>
-              <div className="text-[10px] text-yellow-300/70 mt-1 truncate">{rs.map(r => r.title).join(' · ')}</div>
+              <div className="text-[10px] text-mil-ghost tracking-wider mt-0.5">{l.id} · {rs.length} OFFICIAL RECIPE{rs.length === 1 ? '' : 'S'}</div>
+              <div className="text-[10px] text-mil-red/70 mt-1 truncate">{rs.map(r => r.title).join(' · ')}</div>
             </div>
-            <ArrowRight className="h-4 w-4 text-stone-500 group-hover:text-yellow-300 group-hover:translate-x-0.5 transition mt-1" />
+            <ArrowRight className="h-4 w-4 text-mil-ghost group-hover:text-mil-red group-hover:translate-x-0.5 transition mt-1" />
           </div>
         </button>
       );
@@ -3195,13 +3195,13 @@ if (novelBuilding) {
 return (
 <div className="py-20 text-center">
 <div className="relative inline-block">
-<Brain className="h-12 w-12 mx-auto text-yellow-400 mb-3" style={{ filter: 'drop-shadow(0 0 16px rgba(253,224,71,0.5))' }} />
+<Brain className="h-12 w-12 mx-auto text-mil-redbright mb-3" style={{ filter: 'drop-shadow(0 0 16px rgba(204,34,0,0.5))' }} />
 <div className="absolute inset-0 animate-ping opacity-30">
-<Brain className="h-12 w-12 mx-auto text-yellow-400" />
+<Brain className="h-12 w-12 mx-auto text-mil-redbright" />
 </div>
 </div>
-<div className="text-sm text-yellow-200 tracking-wider mt-4 font-bold">SYNTHESIZING DECK...</div>
-<div className="text-xs text-stone-400 mt-2 max-w-xs mx-auto leading-relaxed">
+<div className="text-sm text-mil-paper tracking-wider mt-4 font-bold">SYNTHESIZING DECK...</div>
+<div className="text-xs text-mil-fade mt-2 max-w-xs mx-auto leading-relaxed">
 Analyzing leader abilities · Detecting archetypes · Scoring {ENRICHED.length} cards against synergy graph · Composing legion
 </div>
 </div>
@@ -3216,44 +3216,44 @@ return <NovelResultView result={novelResult} onBack={backToNovel} onLoad={loadNo
 return (
 <div className="space-y-4">
 <div className="rounded-xl p-4 relative overflow-hidden" style={{
-background: 'linear-gradient(135deg, rgba(192,132,252,0.08), rgba(253,224,71,0.05) 50%, rgba(0,0,0,0))',
-border: '1px solid rgba(253,224,71,0.2)',
+background: 'linear-gradient(135deg, rgba(192,132,252,0.08), rgba(204,34,0,0.05) 50%, rgba(0,0,0,0))',
+border: '1px solid rgba(204,34,0,0.2)',
 }}>
 <div className="flex items-start gap-2">
-<Brain className="h-4 w-4 text-yellow-300 flex-shrink-0 mt-0.5" />
-<div className="text-xs text-stone-200 leading-relaxed">
-<span className="font-bold text-yellow-200">NOVEL BUILDER. </span>
-Composes an original deck from scratch — not a copy of any official recipe. This tool reads your leader's card text, infers their themes (Drone, Soldier, WMD, Territory, etc.), then scores every card in the enriched pool using keyword synergy, cost curve, stat efficiency, and leader-text affinity. Shows <span className="text-yellow-300 font-bold">visible reasoning for every pick</span>. Decks may be unconventional -- that's the point.
+<Brain className="h-4 w-4 text-mil-red flex-shrink-0 mt-0.5" />
+<div className="text-xs text-mil-stone leading-relaxed">
+<span className="font-bold text-mil-paper">NOVEL BUILDER. </span>
+Composes an original deck from scratch — not a copy of any official recipe. This tool reads your leader's card text, infers their themes (Drone, Soldier, WMD, Territory, etc.), then scores every card in the enriched pool using keyword synergy, cost curve, stat efficiency, and leader-text affinity. Shows <span className="text-mil-red font-bold">visible reasoning for every pick</span>. Decks may be unconventional -- that's the point.
 </div>
 </div>
 </div>
 
-  <div className="text-[10px] tracking-[0.2em] text-stone-400">// CHOOSE A LEADER ({enrichedLeaders.length})</div>
+  <div className="text-[10px] tracking-[0.2em] text-mil-fade">// CHOOSE A LEADER ({enrichedLeaders.length})</div>
   <div className="space-y-2">
     {enrichedLeaders.map(l => (
       <button key={l.id} onClick={() => buildNovel(l.id)}
         className="w-full text-left rounded-xl overflow-hidden transition-all group relative"
         style={{
-          background: 'linear-gradient(135deg, rgba(253,224,71,0.06), rgba(20,20,24,0.6) 40%)',
+          background: 'linear-gradient(135deg, rgba(204,34,0,0.06), rgba(13,26,15,0.7) 40%)',
           border: '1px solid rgba(255,255,255,0.06)',
           boxShadow: '0 1px 0 rgba(255,255,255,0.03) inset',
         }}>
         <div className="p-3 flex items-start gap-3">
-          <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(253,224,71,0.12)', boxShadow: '0 0 16px rgba(253,224,71,0.2)' }}>
-            <Crown className="h-5 w-5 text-yellow-300" />
+          <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(204,34,0,0.12)', boxShadow: '0 0 16px rgba(204,34,0,0.2)' }}>
+            <Crown className="h-5 w-5 text-mil-red" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm text-white font-medium truncate">{l.name}</div>
-            <div className="text-[10px] text-stone-500 tracking-wider mt-0.5">
+            <div className="text-[10px] text-mil-ghost tracking-wider mt-0.5">
               {l.id} · MORALE {l.morale} · HP {l.hp}
             </div>
             {l.abilities && (
-              <div className="text-[10px] text-yellow-300/80 tracking-wider mt-1.5 truncate">
+              <div className="text-[10px] text-mil-red/80 tracking-wider mt-1.5 truncate">
                 {l.abilities.filter(a => a.type === 'cooldown').slice(0,3).map(a => `↺${a.cost}:${a.name}`).join(' · ')}
               </div>
             )}
           </div>
-          <ArrowRight className="h-4 w-4 text-stone-500 group-hover:text-yellow-300 group-hover:translate-x-0.5 transition mt-1.5" />
+          <ArrowRight className="h-4 w-4 text-mil-ghost group-hover:text-mil-red group-hover:translate-x-0.5 transition mt-1.5" />
         </div>
       </button>
     ))}
@@ -3269,32 +3269,32 @@ const visiblePicks = showAllPicks ? result.trace : result.trace.slice(0, 8);
 
 return (
 <div className="space-y-4">
-<button onClick={onBack} className="text-xs text-stone-400 hover:text-yellow-300 flex items-center gap-1 transition">
+<button onClick={onBack} className="text-xs text-mil-fade hover:text-mil-red flex items-center gap-1 transition">
 ← BUILD ANOTHER
 </button>
 
   {/* Deck identity card */}
   <div className="relative rounded-xl overflow-hidden" style={{
-    background: 'linear-gradient(135deg, rgba(253,224,71,0.12), rgba(192,132,252,0.06) 50%, rgba(20,20,24,0.8))',
-    border: '1px solid rgba(253,224,71,0.3)',
-    boxShadow: '0 8px 32px -8px rgba(253,224,71,0.2)',
+    background: 'linear-gradient(135deg, rgba(204,34,0,0.12), rgba(192,132,252,0.06) 50%, rgba(13,26,15,0.85))',
+    border: '1px solid rgba(204,34,0,0.3)',
+    boxShadow: '0 8px 32px -8px rgba(204,34,0,0.2)',
   }}>
-    <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(253,224,71,0.6), transparent)' }} />
+    <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(204,34,0,0.6), transparent)' }} />
     <div className="p-4">
-      <div className="text-[10px] tracking-[0.2em] text-yellow-300/80 mb-1">// SYNTHESIZED DECK</div>
+      <div className="text-[10px] tracking-[0.2em] text-mil-red/80 mb-1">// SYNTHESIZED DECK</div>
       <div className="flex items-center gap-2 mb-2">
-        <Crown className="h-5 w-5 text-yellow-300" />
+        <Crown className="h-5 w-5 text-mil-red" />
         <div className="text-xl font-bold text-white truncate">{result.leader.name}</div>
       </div>
       <div className="flex flex-wrap gap-1.5 mb-3">
         {result.themes.map(t => (
-          <span key={t} className="text-[11px] tracking-wider px-2 py-0.5 rounded-md" style={{ background: 'rgba(253,224,71,0.12)', border: '1px solid rgba(253,224,71,0.3)', color: '#fde047' }}>
+          <span key={t} className="text-[11px] tracking-wider px-2 py-0.5 rounded-md" style={{ background: 'rgba(204,34,0,0.12)', border: '1px solid rgba(204,34,0,0.3)', color: '#cc2200' }}>
             {t}
           </span>
         ))}
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <StatBox label="CARDS" value={`${result.totalCards}/65`} color="#fde047" />
+        <StatBox label="CARDS" value={`${result.totalCards}/65`} color="#cc2200" />
         <StatBox label="UNIQUE" value={Object.keys(result.deck).length} color="#86efac" />
         <StatBox label="KEYWORDS" value={Object.values(result.keywordCounts).reduce((s,n)=>s+n,0)} color="#7dd3fc" />
       </div>
@@ -3303,17 +3303,17 @@ return (
 
   {/* Top synergy keywords */}
   {Object.keys(result.keywordCounts).length > 0 && (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="flex items-center gap-2 mb-2">
-        <Network className="h-3.5 w-3.5 text-yellow-300" />
-        <div className="text-xs font-bold text-yellow-200 tracking-wider">SYNERGY DENSITY · TAP TO LEARN</div>
+        <Network className="h-3.5 w-3.5 text-mil-red" />
+        <div className="text-xs font-bold text-mil-paper tracking-wider">SYNERGY DENSITY · TAP TO LEARN</div>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {Object.entries(result.keywordCounts).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([kw, n]) => (
           <button key={kw} onClick={() => teach.showKeyword(kw)} className="text-[11px] px-2 py-1 rounded-md transition" style={{
-            background: 'rgba(253,224,71,0.1)', border: '1px solid rgba(253,224,71,0.3)', color: '#fde047',
+            background: 'rgba(204,34,0,0.1)', border: '1px solid rgba(204,34,0,0.3)', color: '#cc2200',
           }}>
-            {kw} <span className="text-yellow-400/70 font-bold ml-1">×{n}</span>
+            {kw} <span className="text-mil-red/70 font-bold ml-1">×{n}</span>
           </button>
         ))}
       </div>
@@ -3322,10 +3322,10 @@ return (
 
   {/* Cost curve */}
   {Object.keys(result.costCurve).length > 0 && (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="flex items-center gap-2 mb-3">
-        <TrendingUp className="h-3.5 w-3.5 text-yellow-300" />
-        <div className="text-xs font-bold text-yellow-200 tracking-wider">COST CURVE</div>
+        <TrendingUp className="h-3.5 w-3.5 text-mil-red" />
+        <div className="text-xs font-bold text-mil-paper tracking-wider">COST CURVE</div>
       </div>
       <div className="space-y-2">
         {[0, 1, 2, 3].map(c => {
@@ -3334,11 +3334,11 @@ return (
           return (
             <div key={c}>
               <div className="flex justify-between text-[11px] mb-1">
-                <span className="text-stone-300 font-mono">↺ {c}</span>
-                <span className="text-stone-400">{n} cards</span>
+                <span className="text-mil-stone font-mono">↺ {c}</span>
+                <span className="text-mil-fade">{n} cards</span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                <div className="h-full rounded-full transition-all" style={{ width: `${(n/max)*100}%`, background: 'linear-gradient(90deg, #fde047, #fb923c)', boxShadow: '0 0 8px rgba(253,224,71,0.4)' }} />
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.65)' }}>
+                <div className="h-full rounded-full transition-all" style={{ width: `${(n/max)*100}%`, background: 'linear-gradient(90deg, #cc2200, #fb923c)', boxShadow: '0 0 8px rgba(204,34,0,0.4)' }} />
               </div>
             </div>
           );
@@ -3348,10 +3348,10 @@ return (
   )}
 
   {/* Reasoning trace — the special sauce */}
-  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
     <div className="flex items-center gap-2 mb-3">
-      <Brain className="h-3.5 w-3.5 text-yellow-300" />
-      <div className="text-xs font-bold text-yellow-200 tracking-wider">PER-CARD REASONING</div>
+      <Brain className="h-3.5 w-3.5 text-mil-red" />
+      <div className="text-xs font-bold text-mil-paper tracking-wider">PER-CARD REASONING</div>
     </div>
     <div className="space-y-2">
       {visiblePicks.map((pick, i) => (
@@ -3359,7 +3359,7 @@ return (
       ))}
     </div>
     {result.trace.length > 8 && (
-      <button onClick={() => setShowAllPicks(s => !s)} className="w-full mt-3 py-2 rounded-md border border-white/10 text-stone-400 hover:text-yellow-300 hover:border-yellow-400 transition text-[11px] tracking-wider">
+      <button onClick={() => setShowAllPicks(s => !s)} className="w-full mt-3 py-2 rounded-md border border-white/10 text-mil-fade hover:text-mil-red hover:border-mil-red transition text-[11px] tracking-wider">
         {showAllPicks ? `← SHOW TOP 8 ONLY` : `SHOW ALL ${result.trace.length} PICKS →`}
       </button>
     )}
@@ -3372,17 +3372,17 @@ return (
         <AlertTriangle className="h-3.5 w-3.5 text-rose-300" />
         <div className="text-xs font-bold text-rose-200 tracking-wider">PREDICTED WEAKNESSES</div>
       </div>
-      <div className="space-y-1.5 text-xs text-stone-300">
+      <div className="space-y-1.5 text-xs text-mil-stone">
         {result.weaknesses.map((w, i) => (<div key={i} className="leading-relaxed">{w}</div>))}
       </div>
     </div>
   )}
 
   {/* Load button */}
-  <button onClick={onLoad} className="w-full py-4 rounded-xl text-yellow-200 hover:text-white transition flex items-center justify-center gap-2 font-bold tracking-wider sticky bottom-20" style={{
-    background: 'linear-gradient(135deg, rgba(253,224,71,0.25), rgba(253,224,71,0.08))',
-    border: '1px solid rgba(253,224,71,0.5)',
-    boxShadow: '0 8px 32px rgba(253,224,71,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+  <button onClick={onLoad} className="w-full py-4 rounded-xl text-mil-paper hover:text-white transition flex items-center justify-center gap-2 font-bold tracking-wider sticky bottom-20" style={{
+    background: 'linear-gradient(135deg, rgba(204,34,0,0.25), rgba(204,34,0,0.08))',
+    border: '1px solid rgba(204,34,0,0.5)',
+    boxShadow: '0 8px 32px rgba(204,34,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
   }}>
     <Layers className="h-4 w-4" /> SAVE AS NEW DECK
   </button>
@@ -3403,10 +3403,10 @@ border: '1px solid rgba(255,255,255,0.05)',
 <div className="flex items-center gap-2 min-w-0 flex-1">
 <span className="text-[9px] font-bold tracking-wider w-12 flex-shrink-0" style={{ color: meta.color }}>{pick.card.type.slice(0,4).toUpperCase()}</span>
 <span className="text-sm text-white truncate">{pick.card.name}</span>
-<span className="text-[10px] text-stone-500 font-mono">×{pick.copies}</span>
+<span className="text-[10px] text-mil-ghost font-mono">×{pick.copies}</span>
 </div>
 <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
-<span className="text-yellow-300 font-bold text-sm" style={{ textShadow: '0 0 8px rgba(253,224,71,0.4)' }}>{pick.score}</span>
+<span className="text-mil-red font-bold text-sm" style={{ textShadow: '0 0 8px rgba(204,34,0,0.4)' }}>{pick.score}</span>
 </div>
 </div>
 <div className="space-y-0.5 mt-2">
@@ -3415,7 +3415,7 @@ border: '1px solid rgba(255,255,255,0.05)',
 <span className={`font-bold w-7 text-right flex-shrink-0 ${r.pts > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
 {r.pts > 0 ? '+' : ''}{r.pts}
 </span>
-<span className="text-stone-400 leading-relaxed">{r.why}</span>
+<span className="text-mil-fade leading-relaxed">{r.why}</span>
 </div>
 ))}
 </div>
@@ -3442,7 +3442,7 @@ return (
 </div>
 </div>
 <div className="text-sm text-rose-200 tracking-wider mt-4 font-bold">PROFILING TARGET · BUILDING COUNTERS...</div>
-<div className="text-xs text-stone-400 mt-2 max-w-xs mx-auto leading-relaxed">
+<div className="text-xs text-mil-fade mt-2 max-w-xs mx-auto leading-relaxed">
 Predicting target's likely deck · aggregating threat keywords · scoring every card with own-synergy + counter-value · mapping coverage matrix
 </div>
 </div>
@@ -3458,12 +3458,12 @@ if (!counterTargetId) {
 return (
 <div className="space-y-4">
 <div className="rounded-xl p-4 relative overflow-hidden" style={{
-background: 'linear-gradient(135deg, rgba(251,113,133,0.08), rgba(20,20,24,0.6))',
+background: 'linear-gradient(135deg, rgba(251,113,133,0.08), rgba(13,26,15,0.7))',
 border: '1px solid rgba(251,113,133,0.25)',
 }}>
 <div className="flex items-start gap-2">
 <ShieldAlert className="h-4 w-4 text-rose-300 flex-shrink-0 mt-0.5" />
-<div className="text-xs text-stone-200 leading-relaxed">
+<div className="text-xs text-mil-stone leading-relaxed">
 <span className="font-bold text-rose-200">COUNTER-META BUILDER. </span>
 Pick the leader you expect to face. This tool predicts their likely deck by aggregating their official recipes (from rules.warsaken.com) plus an inferred Novel composition, then builds your deck to counter it. Scoring blends your own keyword synergy (35%) with counter-value against the predicted threat profile, and produces a <span className="text-rose-300 font-bold">threat-coverage matrix</span> showing which of their keywords your deck shuts down.
 </div>
@@ -3478,7 +3478,7 @@ Pick the leader you expect to face. This tool predicts their likely deck by aggr
         <button key={l.id} onClick={() => setCounterTargetId(l.id)}
           className="w-full text-left rounded-xl overflow-hidden transition-all group relative"
           style={{
-            background: 'linear-gradient(135deg, rgba(251,113,133,0.06), rgba(20,20,24,0.6) 40%)',
+            background: 'linear-gradient(135deg, rgba(251,113,133,0.06), rgba(13,26,15,0.7) 40%)',
             border: '1px solid rgba(255,255,255,0.06)',
           }}>
           <div className="p-3 flex items-start gap-3">
@@ -3487,11 +3487,11 @@ Pick the leader you expect to face. This tool predicts their likely deck by aggr
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm text-white font-medium truncate">{l.name}</div>
-              <div className="text-[10px] text-stone-500 tracking-wider mt-0.5">
+              <div className="text-[10px] text-mil-ghost tracking-wider mt-0.5">
                 {l.id} · {recipeCount} RECIPE{recipeCount === 1 ? '' : 'S'} · {l.hasFullData ? 'ENRICHED' : 'BASE'}
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-stone-500 group-hover:text-rose-300 group-hover:translate-x-0.5 transition mt-1.5" />
+            <ArrowRight className="h-4 w-4 text-mil-ghost group-hover:text-rose-300 group-hover:translate-x-0.5 transition mt-1.5" />
           </div>
         </button>
       );
@@ -3506,9 +3506,9 @@ Pick the leader you expect to face. This tool predicts their likely deck by aggr
 const target = getCard(counterTargetId);
 return (
 <div className="space-y-4">
-<button onClick={() => setCounterTargetId(null)} className="text-xs text-stone-400 hover:text-rose-300 flex items-center gap-1 transition">← CHANGE TARGET</button>
+<button onClick={() => setCounterTargetId(null)} className="text-xs text-mil-fade hover:text-rose-300 flex items-center gap-1 transition">← CHANGE TARGET</button>
 
-  <div className="rounded-xl p-3" style={{ background: 'linear-gradient(135deg, rgba(251,113,133,0.1), rgba(20,20,24,0.7))', border: '1px solid rgba(251,113,133,0.3)' }}>
+  <div className="rounded-xl p-3" style={{ background: 'linear-gradient(135deg, rgba(251,113,133,0.1), rgba(13,26,15,0.8))', border: '1px solid rgba(251,113,133,0.3)' }}>
     <div className="text-[10px] tracking-[0.2em] text-rose-300/80 mb-1">// TARGET</div>
     <div className="flex items-center gap-2">
       <Crown className="h-4 w-4 text-rose-300" />
@@ -3516,27 +3516,27 @@ return (
     </div>
   </div>
 
-  <div className="text-[10px] tracking-[0.2em] text-yellow-300/80">// STEP 2 · WHO YOU PLAY ({enrichedLeaders.length})</div>
+  <div className="text-[10px] tracking-[0.2em] text-mil-red/80">// STEP 2 · WHO YOU PLAY ({enrichedLeaders.length})</div>
   <div className="space-y-2">
     {enrichedLeaders.map(l => (
       <button key={l.id} onClick={() => buildCounter(l.id, counterTargetId)}
         disabled={l.id === counterTargetId}
         className="w-full text-left rounded-xl overflow-hidden transition-all group relative disabled:opacity-30 disabled:cursor-not-allowed"
         style={{
-          background: 'linear-gradient(135deg, rgba(253,224,71,0.06), rgba(20,20,24,0.6) 40%)',
+          background: 'linear-gradient(135deg, rgba(204,34,0,0.06), rgba(13,26,15,0.7) 40%)',
           border: '1px solid rgba(255,255,255,0.06)',
         }}>
         <div className="p-3 flex items-start gap-3">
-          <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(253,224,71,0.12)', boxShadow: '0 0 16px rgba(253,224,71,0.2)' }}>
-            <Crown className="h-5 w-5 text-yellow-300" />
+          <div className="h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(204,34,0,0.12)', boxShadow: '0 0 16px rgba(204,34,0,0.2)' }}>
+            <Crown className="h-5 w-5 text-mil-red" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm text-white font-medium truncate">{l.name}</div>
-            <div className="text-[10px] text-stone-500 tracking-wider mt-0.5">
+            <div className="text-[10px] text-mil-ghost tracking-wider mt-0.5">
               {l.id} · MORALE {l.morale} · HP {l.hp}{l.id === counterTargetId ? ' · (TARGET)' : ''}
             </div>
           </div>
-          <ArrowRight className="h-4 w-4 text-stone-500 group-hover:text-yellow-300 group-hover:translate-x-0.5 transition mt-1.5" />
+          <ArrowRight className="h-4 w-4 text-mil-ghost group-hover:text-mil-red group-hover:translate-x-0.5 transition mt-1.5" />
         </div>
       </button>
     ))}
@@ -3554,18 +3554,18 @@ const maxWeight = Math.max(1, ...sortedThreats.map(t => t[1].weight));
 
 return (
 <div className="space-y-4">
-<button onClick={onBack} className="text-xs text-stone-400 hover:text-rose-300 flex items-center gap-1 transition">
+<button onClick={onBack} className="text-xs text-mil-fade hover:text-rose-300 flex items-center gap-1 transition">
 ← BUILD ANOTHER
 </button>
 
   {/* Side-by-side header: target (red) vs you (yellow) */}
   <div className="relative rounded-xl overflow-hidden" style={{
-    background: 'linear-gradient(135deg, rgba(251,113,133,0.12), rgba(20,20,24,0.85) 50%, rgba(253,224,71,0.12))',
+    background: 'linear-gradient(135deg, rgba(251,113,133,0.12), rgba(20,20,24,0.85) 50%, rgba(204,34,0,0.12))',
     border: '1px solid rgba(255,255,255,0.08)',
-    boxShadow: '0 8px 32px -8px rgba(251,113,133,0.2), 0 8px 32px -8px rgba(253,224,71,0.2)',
+    boxShadow: '0 8px 32px -8px rgba(251,113,133,0.2), 0 8px 32px -8px rgba(204,34,0,0.2)',
   }}>
     <div className="p-4">
-      <div className="text-[10px] tracking-[0.2em] text-stone-300/80 mb-2">// COUNTER-META BUILD</div>
+      <div className="text-[10px] tracking-[0.2em] text-mil-stone/80 mb-2">// COUNTER-META BUILD</div>
       <div className="grid grid-cols-2 gap-3 items-start">
         <div className="text-left min-w-0">
           <div className="text-[9px] tracking-[0.25em] text-rose-300/80 mb-1">TARGET</div>
@@ -3577,27 +3577,27 @@ return (
             <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,113,133,0.15)', border: '1px solid rgba(251,113,133,0.3)', color: '#fda4af' }}>
               {result.threat.archetype.toUpperCase()}
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)', color: '#a8a29e' }}>
+            <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.08)', color: '#a8a29e' }}>
               {Math.round(result.threat.confidence * 100)}% KNOWN
             </span>
           </div>
         </div>
         <div className="text-right min-w-0">
-          <div className="text-[9px] tracking-[0.25em] text-yellow-300/80 mb-1">YOU PLAY</div>
+          <div className="text-[9px] tracking-[0.25em] text-mil-red/80 mb-1">YOU PLAY</div>
           <div className="flex items-center gap-1.5 justify-end">
             <div className="text-base font-bold text-white truncate">{result.leader.name}</div>
-            <Crown className="h-4 w-4 text-yellow-300 flex-shrink-0" />
+            <Crown className="h-4 w-4 text-mil-red flex-shrink-0" />
           </div>
           <div className="flex flex-wrap gap-1 mt-1.5 justify-end">
             {result.themes.map(t => (
-              <span key={t} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(253,224,71,0.15)', border: '1px solid rgba(253,224,71,0.3)', color: '#fde047' }}>{t}</span>
+              <span key={t} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(204,34,0,0.15)', border: '1px solid rgba(204,34,0,0.3)', color: '#cc2200' }}>{t}</span>
             ))}
           </div>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-2 mt-4">
-        <StatBox label="CARDS" value={`${result.totalCards}/65`} color="#fde047" />
-        <StatBox label="COVERAGE" value={`${Math.round(result.coveragePct * 100)}%`} color={result.coveragePct >= 0.5 ? '#86efac' : result.coveragePct >= 0.25 ? '#fde047' : '#fb7185'} />
+        <StatBox label="CARDS" value={`${result.totalCards}/65`} color="#cc2200" />
+        <StatBox label="COVERAGE" value={`${Math.round(result.coveragePct * 100)}%`} color={result.coveragePct >= 0.5 ? '#86efac' : result.coveragePct >= 0.25 ? '#cc2200' : '#fb7185'} />
         <StatBox label="THREATS" value={`${result.coveredThreats}/${result.totalThreats}`} color="#7dd3fc" />
       </div>
     </div>
@@ -3617,21 +3617,21 @@ return (
           return (
             <div key={kw} className="text-[11px]">
               <div className="flex items-center justify-between mb-1 gap-2">
-                <button onClick={() => teach.showKeyword(kw)} className="font-mono tracking-wider transition" style={{ color: covered ? '#fde047' : '#fb7185' }}>
+                <button onClick={() => teach.showKeyword(kw)} className="font-mono tracking-wider transition" style={{ color: covered ? '#cc2200' : '#fb7185' }}>
                   {covered ? '✓' : '⚠'} {kw}
                 </button>
-                <span className="text-stone-500 text-[10px]">
+                <span className="text-mil-ghost text-[10px]">
                   threat {info.weight.toFixed(1)} · counters <span style={{ color: covered ? '#86efac' : '#fb7185' }} className="font-bold">×{info.counterCount}</span>
                 </span>
               </div>
-              <div className="relative h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
+              <div className="relative h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.65)' }}>
                 <div className="absolute inset-y-0 left-0 rounded-full" style={{
                   width: `${widthThreat}%`,
                   background: covered ? 'linear-gradient(90deg, rgba(134,239,172,0.7), rgba(134,239,172,0.3))' : 'linear-gradient(90deg, rgba(251,113,133,0.7), rgba(251,113,133,0.3))',
                 }} />
               </div>
               {covered && info.counterCards.length > 0 && (
-                <div className="text-[10px] text-stone-500 mt-1 truncate">
+                <div className="text-[10px] text-mil-ghost mt-1 truncate">
                   → {info.counterCards.slice(0, 3).map(cc => `${cc.ourKw}/${cc.name}`).join(' · ')}{info.counterCards.length > 3 ? ` · +${info.counterCards.length - 3}` : ''}
                 </div>
               )}
@@ -3644,31 +3644,31 @@ return (
 
   {/* Force-type triangle coverage */}
   {Object.keys(result.triangleCoverage).length > 0 && (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="flex items-center gap-2 mb-3">
-        <Shield className="h-3.5 w-3.5 text-yellow-300" />
-        <div className="text-xs font-bold text-yellow-200 tracking-wider">FORCE-TYPE TRIANGLE</div>
+        <Shield className="h-3.5 w-3.5 text-mil-red" />
+        <div className="text-xs font-bold text-mil-paper tracking-wider">FORCE-TYPE TRIANGLE</div>
       </div>
       <div className="grid grid-cols-3 gap-2">
         {['Ground', 'Air', 'Navy'].map(type => {
           const info = result.triangleCoverage[type];
           if (!info) {
             return (
-              <div key={type} className="text-center rounded-lg p-2 opacity-40" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div className="text-[9px] tracking-[0.2em] text-stone-400">{type.toUpperCase()}</div>
-                <div className="text-base font-bold mt-1 text-stone-600">—</div>
-                <div className="text-[9px] text-stone-600 mt-0.5">no threat</div>
+              <div key={type} className="text-center rounded-lg p-2 opacity-40" style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="text-[9px] tracking-[0.2em] text-mil-fade">{type.toUpperCase()}</div>
+                <div className="text-base font-bold mt-1 text-mil-ghost/70">—</div>
+                <div className="text-[9px] text-mil-ghost/70 mt-0.5">no threat</div>
               </div>
             );
           }
           const ratio = info.threatCount > 0 ? Math.min(info.counterCount / Math.max(info.threatCount / 4, 1), 1) : 0;
-          const color = ratio >= 0.5 ? '#86efac' : ratio >= 0.2 ? '#fde047' : '#fb7185';
+          const color = ratio >= 0.5 ? '#86efac' : ratio >= 0.2 ? '#cc2200' : '#fb7185';
           return (
-            <div key={type} className="text-center rounded-lg p-2" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <div className="text-[9px] tracking-[0.2em] text-stone-400">{type.toUpperCase()}</div>
+            <div key={type} className="text-center rounded-lg p-2" style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="text-[9px] tracking-[0.2em] text-mil-fade">{type.toUpperCase()}</div>
               <div className="text-base font-bold mt-1" style={{ color }}>×{info.counterCount}</div>
-              <div className="text-[9px] text-stone-500 mt-0.5">{info.counterKw}</div>
-              <div className="text-[9px] text-stone-600 mt-0.5">vs {info.threatCount.toFixed(0)} forces</div>
+              <div className="text-[9px] text-mil-ghost mt-0.5">{info.counterKw}</div>
+              <div className="text-[9px] text-mil-ghost/70 mt-0.5">vs {info.threatCount.toFixed(0)} forces</div>
             </div>
           );
         })}
@@ -3678,17 +3678,17 @@ return (
 
   {/* Your deck synergy density */}
   {Object.keys(result.keywordCounts).length > 0 && (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="flex items-center gap-2 mb-2">
-        <Network className="h-3.5 w-3.5 text-yellow-300" />
-        <div className="text-xs font-bold text-yellow-200 tracking-wider">YOUR DECK · SYNERGY DENSITY</div>
+        <Network className="h-3.5 w-3.5 text-mil-red" />
+        <div className="text-xs font-bold text-mil-paper tracking-wider">YOUR DECK · SYNERGY DENSITY</div>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {Object.entries(result.keywordCounts).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([kw, n]) => (
           <button key={kw} onClick={() => teach.showKeyword(kw)} className="text-[11px] px-2 py-1 rounded-md transition" style={{
-            background: 'rgba(253,224,71,0.1)', border: '1px solid rgba(253,224,71,0.3)', color: '#fde047',
+            background: 'rgba(204,34,0,0.1)', border: '1px solid rgba(204,34,0,0.3)', color: '#cc2200',
           }}>
-            {kw} <span className="text-yellow-400/70 font-bold ml-1">×{n}</span>
+            {kw} <span className="text-mil-red/70 font-bold ml-1">×{n}</span>
           </button>
         ))}
       </div>
@@ -3697,10 +3697,10 @@ return (
 
   {/* Cost curve */}
   {Object.keys(result.costCurve).length > 0 && (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="flex items-center gap-2 mb-3">
-        <TrendingUp className="h-3.5 w-3.5 text-yellow-300" />
-        <div className="text-xs font-bold text-yellow-200 tracking-wider">COST CURVE</div>
+        <TrendingUp className="h-3.5 w-3.5 text-mil-red" />
+        <div className="text-xs font-bold text-mil-paper tracking-wider">COST CURVE</div>
       </div>
       <div className="space-y-2">
         {[0, 1, 2, 3].map(c => {
@@ -3709,11 +3709,11 @@ return (
           return (
             <div key={c}>
               <div className="flex justify-between text-[11px] mb-1">
-                <span className="text-stone-300 font-mono">↺ {c}</span>
-                <span className="text-stone-400">{n} cards</span>
+                <span className="text-mil-stone font-mono">↺ {c}</span>
+                <span className="text-mil-fade">{n} cards</span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                <div className="h-full rounded-full transition-all" style={{ width: `${(n/max)*100}%`, background: 'linear-gradient(90deg, #fde047, #fb923c)', boxShadow: '0 0 8px rgba(253,224,71,0.4)' }} />
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.65)' }}>
+                <div className="h-full rounded-full transition-all" style={{ width: `${(n/max)*100}%`, background: 'linear-gradient(90deg, #cc2200, #fb923c)', boxShadow: '0 0 8px rgba(204,34,0,0.4)' }} />
               </div>
             </div>
           );
@@ -3723,10 +3723,10 @@ return (
   )}
 
   {/* Per-card reasoning */}
-  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+  <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
     <div className="flex items-center gap-2 mb-3">
-      <Brain className="h-3.5 w-3.5 text-yellow-300" />
-      <div className="text-xs font-bold text-yellow-200 tracking-wider">PER-CARD REASONING</div>
+      <Brain className="h-3.5 w-3.5 text-mil-red" />
+      <div className="text-xs font-bold text-mil-paper tracking-wider">PER-CARD REASONING</div>
     </div>
     <div className="space-y-2">
       {visiblePicks.map(pick => (
@@ -3734,7 +3734,7 @@ return (
       ))}
     </div>
     {result.trace.length > 8 && (
-      <button onClick={() => setShowAllPicks(s => !s)} className="w-full mt-3 py-2 rounded-md border border-white/10 text-stone-400 hover:text-yellow-300 hover:border-yellow-400 transition text-[11px] tracking-wider">
+      <button onClick={() => setShowAllPicks(s => !s)} className="w-full mt-3 py-2 rounded-md border border-white/10 text-mil-fade hover:text-mil-red hover:border-mil-red transition text-[11px] tracking-wider">
         {showAllPicks ? `← SHOW TOP 8 ONLY` : `SHOW ALL ${result.trace.length} PICKS →`}
       </button>
     )}
@@ -3747,7 +3747,7 @@ return (
         <AlertTriangle className="h-3.5 w-3.5 text-rose-300" />
         <div className="text-xs font-bold text-rose-200 tracking-wider">PREDICTED WEAKNESSES</div>
       </div>
-      <div className="space-y-1.5 text-xs text-stone-300">
+      <div className="space-y-1.5 text-xs text-mil-stone">
         {result.weaknesses.map((w, i) => (<div key={i} className="leading-relaxed">{w}</div>))}
       </div>
     </div>
@@ -3777,11 +3777,11 @@ border: '1px solid rgba(255,255,255,0.05)',
 <div className="flex items-center gap-2 min-w-0 flex-1">
 <span className="text-[9px] font-bold tracking-wider w-12 flex-shrink-0" style={{ color: meta.color }}>{pick.card.type.slice(0,4).toUpperCase()}</span>
 <span className="text-sm text-white truncate">{pick.card.name}</span>
-<span className="text-[10px] text-stone-500 font-mono">×{pick.copies}</span>
+<span className="text-[10px] text-mil-ghost font-mono">×{pick.copies}</span>
 </div>
 <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
-<span className="text-[10px] text-stone-500">own {pick.ownScore} + ctr {pick.counterScore} =</span>
-<span className="text-yellow-300 font-bold text-sm" style={{ textShadow: '0 0 8px rgba(253,224,71,0.4)' }}>{pick.score}</span>
+<span className="text-[10px] text-mil-ghost">own {pick.ownScore} + ctr {pick.counterScore} =</span>
+<span className="text-mil-red font-bold text-sm" style={{ textShadow: '0 0 8px rgba(204,34,0,0.4)' }}>{pick.score}</span>
 </div>
 </div>
 {pick.counterReasons.length > 0 && (
@@ -3801,7 +3801,7 @@ border: '1px solid rgba(255,255,255,0.05)',
 <span className={`font-bold w-7 text-right flex-shrink-0 ${r.pts > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
 {r.pts > 0 ? '+' : ''}{r.pts}
 </span>
-<span className="text-stone-400 leading-relaxed">{r.why}</span>
+<span className="text-mil-fade leading-relaxed">{r.why}</span>
 </div>
 ))}
 </div>
@@ -3857,26 +3857,26 @@ return { card: getCard(id), keywords: kws, rarityScore };
 
 return (
 <>
-<header className="sticky top-0 z-30 border-b border-stone-800 bg-stone-950/95 backdrop-blur">
+<header className="sticky top-0 z-30 border-b border-mil-border bg-stone-950/95 backdrop-blur">
 <div className="px-4 py-3">
 <div className="flex items-center justify-between mb-2">
 <div className="flex items-center gap-2">
-<Network className="h-3.5 w-3.5 text-yellow-300" />
-<h1 className="text-xs tracking-[0.3em] text-stone-300 uppercase">Synergy Discoverer</h1>
+<Network className="h-3.5 w-3.5 text-mil-red" />
+<h1 className="text-xs tracking-[0.3em] text-mil-stone uppercase">Synergy Discoverer</h1>
 </div>
-<span className="text-[10px] text-stone-500 tracking-wider">{SYN.edges.length} EDGES · {SYN.coOccurrences.length} COMBOS</span>
+<span className="text-[10px] text-mil-ghost tracking-wider">{SYN.edges.length} EDGES · {SYN.coOccurrences.length} COMBOS</span>
 </div>
 <div className="flex gap-1 overflow-x-auto pb-1">
-<button onClick={() => setView('combos')} className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${view === 'combos' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>
+<button onClick={() => setView('combos')} className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${view === 'combos' ? 'border-mil-red text-mil-red bg-mil-red/10' : 'border-mil-border text-mil-fade'}`}>
 <Flame className="h-3 w-3 inline -mt-0.5 mr-1" />TOP COMBOS
 </button>
-<button onClick={() => setView('keyword')} className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${view === 'keyword' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>
+<button onClick={() => setView('keyword')} className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${view === 'keyword' ? 'border-mil-red text-mil-red bg-mil-red/10' : 'border-mil-border text-mil-fade'}`}>
 <GitBranch className="h-3 w-3 inline -mt-0.5 mr-1" />KEYWORDS
 </button>
-<button onClick={() => setView('card')} className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${view === 'card' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>
+<button onClick={() => setView('card')} className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${view === 'card' ? 'border-mil-red text-mil-red bg-mil-red/10' : 'border-mil-border text-mil-fade'}`}>
 <Target className="h-3 w-3 inline -mt-0.5 mr-1" />CARDS
 </button>
-<button onClick={() => setView('outliers')} className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${view === 'outliers' ? 'border-yellow-400 text-yellow-300 bg-yellow-400/10' : 'border-stone-800 text-stone-400'}`}>
+<button onClick={() => setView('outliers')} className={`text-[11px] px-2.5 py-1 border whitespace-nowrap transition ${view === 'outliers' ? 'border-mil-red text-mil-red bg-mil-red/10' : 'border-mil-border text-mil-fade'}`}>
 <Sparkles className="h-3 w-3 inline -mt-0.5 mr-1" />OUTLIERS
 </button>
 </div>
@@ -3885,11 +3885,11 @@ return (
 
   <main className="px-4 py-4">
     {/* Methodology disclosure */}
-    <div className="border border-yellow-500/30 bg-yellow-500/5 p-3 mb-4 text-xs text-stone-300 leading-relaxed">
+    <div className="border border-mil-red/30 bg-mil-red/5 p-3 mb-4 text-xs text-mil-stone leading-relaxed">
       <div className="flex items-start gap-2">
-        <Brain className="h-4 w-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+        <Brain className="h-4 w-4 text-mil-redbright flex-shrink-0 mt-0.5" />
         <div>
-          <span className="font-bold text-yellow-300">METHODOLOGY: </span>
+          <span className="font-bold text-mil-red">METHODOLOGY: </span>
           Edges parsed from official rules text (e.g., "ARMORED: Not affected by DEAD MAN" → ARMORED counters DEAD MAN). Combos found by co-occurrence on enriched cards. Quality scales with the {Object.keys(SYN.cardKeywords).length}-card keyword pool.
         </div>
       </div>
@@ -3897,9 +3897,9 @@ return (
 
     {view === 'combos' && (
       <div className="space-y-2">
-        <div className="text-xs tracking-wider text-stone-400">// TOP KEYWORD COMBOS</div>
+        <div className="text-xs tracking-wider text-mil-fade">// TOP KEYWORD COMBOS</div>
         {topCombos.length === 0 ? (
-          <div className="text-center py-12 text-stone-500 text-sm">No combos discovered yet.</div>
+          <div className="text-center py-12 text-mil-ghost text-sm">No combos discovered yet.</div>
         ) : topCombos.map(c => (
           <ComboCard key={c.pair.join('+')} combo={c} onPickKeyword={(k) => { setSelectedKeyword(k); setView('keyword'); }} onPickCard={(id) => { setSelectedCardId(id); setView('card'); }} />
         ))}
@@ -3909,11 +3909,11 @@ return (
     {view === 'keyword' && !selectedKeyword && (
       <div className="space-y-2">
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mil-ghost" />
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="search.keywords_"
-            className="w-full bg-stone-900 border border-stone-800 pl-10 pr-3 py-2 text-sm text-stone-100 placeholder:text-stone-600 focus:border-yellow-400 focus:outline-none transition" />
+            className="w-full bg-mil-panel border border-mil-border pl-10 pr-3 py-2 text-sm text-mil-paper placeholder:text-mil-ghost/70 focus:border-mil-red focus:outline-none transition" />
         </div>
-        <div className="text-xs tracking-wider text-stone-400">// PICK A KEYWORD TO INSPECT</div>
+        <div className="text-xs tracking-wider text-mil-fade">// PICK A KEYWORD TO INSPECT</div>
         <div className="grid grid-cols-2 gap-1.5">
           {SYN.keywords
             .filter(k => k.name.length < 30)
@@ -3924,9 +3924,9 @@ return (
               const edges = getEdgesFor(k.name);
               return (
                 <button key={k.name} onClick={() => setSelectedKeyword(k.name)}
-                  className="text-left border border-stone-800 bg-stone-900/40 hover:bg-stone-900 hover:border-yellow-400 transition p-2">
-                  <div className="text-[11px] font-bold tracking-wider text-yellow-300 truncate">{k.name}</div>
-                  <div className="text-[9px] text-stone-500 mt-0.5">{cards.length} cards · {edges.length} edges</div>
+                  className="text-left border border-mil-border bg-mil-panel/60 hover:bg-mil-panel hover:border-mil-red transition p-2">
+                  <div className="text-[11px] font-bold tracking-wider text-mil-red truncate">{k.name}</div>
+                  <div className="text-[9px] text-mil-ghost mt-0.5">{cards.length} cards · {edges.length} edges</div>
                 </button>
               );
             })}
@@ -3943,17 +3943,17 @@ return (
 
     {view === 'card' && !selectedCardId && (
       <div className="space-y-2">
-        <div className="text-xs tracking-wider text-stone-400">// CARDS RANKED BY SYNERGY SCORE</div>
+        <div className="text-xs tracking-wider text-mil-fade">// CARDS RANKED BY SYNERGY SCORE</div>
         {cardScores.map(({ card, score, keywords }) => (
           <button key={card.id} onClick={() => setSelectedCardId(card.id)}
-            className="w-full text-left border border-stone-800 bg-stone-900/40 hover:bg-stone-900 hover:border-yellow-400 transition p-3">
+            className="w-full text-left border border-mil-border bg-mil-panel/60 hover:bg-mil-panel hover:border-mil-red transition p-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-sm text-stone-100 font-medium truncate flex-1">{card.name}</span>
-              <span className="text-yellow-300 font-bold ml-2">{score}</span>
+              <span className="text-sm text-mil-paper font-medium truncate flex-1">{card.name}</span>
+              <span className="text-mil-red font-bold ml-2">{score}</span>
             </div>
             <div className="flex flex-wrap gap-1">
               {keywords.map(k => (
-                <span key={k} className="text-[9px] px-1.5 py-0.5 bg-yellow-400/10 border border-yellow-400/30 text-yellow-200">{k}</span>
+                <span key={k} className="text-[9px] px-1.5 py-0.5 bg-mil-red/10 border border-mil-red/30 text-mil-paper">{k}</span>
               ))}
             </div>
           </button>
@@ -3969,20 +3969,20 @@ return (
 
     {view === 'outliers' && (
       <div className="space-y-2">
-        <div className="text-xs tracking-wider text-stone-400 mb-2">// CARDS WITH RARE KEYWORD COMBINATIONS</div>
-        <div className="text-[10px] text-stone-500 mb-3 leading-relaxed">
+        <div className="text-xs tracking-wider text-mil-fade mb-2">// CARDS WITH RARE KEYWORD COMBINATIONS</div>
+        <div className="text-[10px] text-mil-ghost mb-3 leading-relaxed">
           Cards holding keywords that don't appear together often anywhere else. These are candidates for "hidden power" — combinations the meta hasn't fully explored.
         </div>
         {outliers.map(({ card, keywords, rarityScore }) => (
           <button key={card.id} onClick={() => { setSelectedCardId(card.id); setView('card'); }}
-            className="w-full text-left border border-stone-800 bg-stone-900/40 hover:bg-stone-900 hover:border-yellow-400 transition p-3">
+            className="w-full text-left border border-mil-border bg-mil-panel/60 hover:bg-mil-panel hover:border-mil-red transition p-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-sm text-stone-100 font-medium truncate flex-1">{card.name}</span>
-              <span className="text-yellow-300 text-[11px] tracking-wider ml-2">RARITY {rarityScore.toFixed(2)}</span>
+              <span className="text-sm text-mil-paper font-medium truncate flex-1">{card.name}</span>
+              <span className="text-mil-red text-[11px] tracking-wider ml-2">RARITY {rarityScore.toFixed(2)}</span>
             </div>
             <div className="flex flex-wrap gap-1">
               {keywords.map(k => (
-                <span key={k} className="text-[9px] px-1.5 py-0.5 bg-yellow-400/10 border border-yellow-400/30 text-yellow-200">{k}</span>
+                <span key={k} className="text-[9px] px-1.5 py-0.5 bg-mil-red/10 border border-mil-red/30 text-mil-paper">{k}</span>
               ))}
             </div>
           </button>
@@ -3997,14 +3997,14 @@ return (
 
 function ComboCard({ combo, onPickKeyword, onPickCard }) {
 return (
-<div className="border border-stone-800 bg-stone-900/40 p-3">
+<div className="border border-mil-border bg-mil-panel/60 p-3">
 <div className="flex items-center justify-between mb-2">
 <div className="flex items-center gap-2 flex-wrap">
-<button onClick={() => onPickKeyword(combo.pair[0])} className="text-[11px] font-bold tracking-wider px-2 py-0.5 bg-yellow-400/10 border border-yellow-400/30 text-yellow-200 hover:bg-yellow-400/20">
+<button onClick={() => onPickKeyword(combo.pair[0])} className="text-[11px] font-bold tracking-wider px-2 py-0.5 bg-mil-red/10 border border-mil-red/30 text-mil-paper hover:bg-mil-red/20">
 {combo.pair[0]}
 </button>
-<Plus className="h-3 w-3 text-stone-600" />
-<button onClick={() => onPickKeyword(combo.pair[1])} className="text-[11px] font-bold tracking-wider px-2 py-0.5 bg-yellow-400/10 border border-yellow-400/30 text-yellow-200 hover:bg-yellow-400/20">
+<Plus className="h-3 w-3 text-mil-ghost/70" />
+<button onClick={() => onPickKeyword(combo.pair[1])} className="text-[11px] font-bold tracking-wider px-2 py-0.5 bg-mil-red/10 border border-mil-red/30 text-mil-paper hover:bg-mil-red/20">
 {combo.pair[1]}
 </button>
 </div>
@@ -4015,17 +4015,17 @@ return (
 {combo.hasCounters && (
 <span className="text-rose-400 tracking-wider">COUNTERS</span>
 )}
-<span className="text-yellow-300 font-bold">{combo.score}</span>
+<span className="text-mil-red font-bold">{combo.score}</span>
 </div>
 </div>
 {combo.cardsWithBoth.length > 0 && (
 <div className="space-y-1">
-<div className="text-[9px] text-stone-500 tracking-wider">FOUND ON {combo.cardsWithBoth.length} CARD{combo.cardsWithBoth.length === 1 ? '' : 'S'}:</div>
+<div className="text-[9px] text-mil-ghost tracking-wider">FOUND ON {combo.cardsWithBoth.length} CARD{combo.cardsWithBoth.length === 1 ? '' : 'S'}:</div>
 {combo.cardsWithBoth.map(id => {
 const card = getCard(id);
 if (!card) return null;
 return (
-<button key={id} onClick={() => onPickCard(id)} className="w-full text-left text-xs text-stone-200 hover:text-yellow-300 transition">
+<button key={id} onClick={() => onPickCard(id)} className="w-full text-left text-xs text-mil-stone hover:text-mil-red transition">
 · {card.name}
 </button>
 );
@@ -4045,13 +4045,13 @@ const refEdges = edges.filter(e => e[2] === 'references');
 
 return (
 <div className="space-y-3">
-<button onClick={onBack} className="text-xs text-stone-400 hover:text-yellow-300 flex items-center gap-1">← BACK</button>
-<div className="border border-yellow-400/40 bg-yellow-400/5 p-3">
-<div className="text-[10px] tracking-wider text-yellow-300 mb-1">// KEYWORD</div>
-<div className="text-xl font-bold text-stone-100 mb-2">{keyword}</div>
-{kwData?.text && <div className="text-sm text-stone-200 leading-relaxed">{kwData.text}</div>}
+<button onClick={onBack} className="text-xs text-mil-fade hover:text-mil-red flex items-center gap-1">← BACK</button>
+<div className="border border-mil-red/40 bg-yellow-400/5 p-3">
+<div className="text-[10px] tracking-wider text-mil-red mb-1">// KEYWORD</div>
+<div className="text-xl font-bold text-mil-paper mb-2">{keyword}</div>
+{kwData?.text && <div className="text-sm text-mil-stone leading-relaxed">{kwData.text}</div>}
 {kwData?.detail && (
-<div className="text-xs text-stone-400 leading-relaxed mt-2 pt-2 border-t border-yellow-400/20">{kwData.detail}</div>
+<div className="text-xs text-mil-fade leading-relaxed mt-2 pt-2 border-t border-mil-red/20">{kwData.detail}</div>
 )}
 </div>
 
@@ -4061,9 +4061,9 @@ return (
       <div className="space-y-1.5 text-xs">
         {counterEdges.map((e, i) => (
           <div key={i} className="flex items-center gap-2">
-            <button onClick={() => onPickKeyword(e[0] === keyword ? e[1] : e[0])} className="font-bold text-yellow-200 hover:text-yellow-300">{e[0]}</button>
-            <span className="text-stone-500">→ counters →</span>
-            <button onClick={() => onPickKeyword(e[1] === keyword ? e[0] : e[1])} className="font-bold text-yellow-200 hover:text-yellow-300">{e[1]}</button>
+            <button onClick={() => onPickKeyword(e[0] === keyword ? e[1] : e[0])} className="font-bold text-mil-paper hover:text-mil-red">{e[0]}</button>
+            <span className="text-mil-ghost">→ counters →</span>
+            <button onClick={() => onPickKeyword(e[1] === keyword ? e[0] : e[1])} className="font-bold text-mil-paper hover:text-mil-red">{e[1]}</button>
           </div>
         ))}
       </div>
@@ -4071,13 +4071,13 @@ return (
   )}
 
   {refEdges.length > 0 && (
-    <div className="border border-stone-800 bg-stone-900/40 p-3">
-      <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">REFERENCED IN RULES</div>
+    <div className="border border-mil-border bg-mil-panel/60 p-3">
+      <div className="text-mil-red text-xs font-bold tracking-wider mb-2">REFERENCED IN RULES</div>
       <div className="flex flex-wrap gap-1.5">
         {refEdges.map((e, i) => {
           const other = e[0] === keyword ? e[1] : e[0];
           return (
-            <button key={i} onClick={() => onPickKeyword(other)} className="text-[11px] px-2 py-1 bg-stone-800 border border-stone-700 text-stone-200 hover:border-yellow-400 hover:text-yellow-300 transition">
+            <button key={i} onClick={() => onPickKeyword(other)} className="text-[11px] px-2 py-1 bg-mil-muted border border-mil-green text-mil-stone hover:border-mil-red hover:text-mil-red transition">
               {other}
             </button>
           );
@@ -4086,16 +4086,16 @@ return (
     </div>
   )}
 
-  <div className="border border-stone-800 bg-stone-900/40 p-3">
-    <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">CARDS WITH THIS KEYWORD ({cards.length})</div>
+  <div className="border border-mil-border bg-mil-panel/60 p-3">
+    <div className="text-mil-red text-xs font-bold tracking-wider mb-2">CARDS WITH THIS KEYWORD ({cards.length})</div>
     {cards.length === 0 ? (
-      <div className="text-xs text-stone-500">No enriched cards have this keyword yet.</div>
+      <div className="text-xs text-mil-ghost">No enriched cards have this keyword yet.</div>
     ) : (
       <div className="space-y-1">
         {cards.map(c => (
-          <button key={c.id} onClick={() => onPickCard(c.id)} className="w-full text-left flex items-center justify-between text-xs hover:text-yellow-300 transition">
-            <span className="text-stone-200 truncate">{c.name}</span>
-            <span className="text-stone-600 text-[10px] ml-2">{c.id}</span>
+          <button key={c.id} onClick={() => onPickCard(c.id)} className="w-full text-left flex items-center justify-between text-xs hover:text-mil-red transition">
+            <span className="text-mil-stone truncate">{c.name}</span>
+            <span className="text-mil-ghost/70 text-[10px] ml-2">{c.id}</span>
           </button>
         ))}
       </div>
@@ -4140,23 +4140,23 @@ total: kws.length,
 
 return (
 <div className="space-y-3">
-<button onClick={onBack} className="text-xs text-stone-400 hover:text-yellow-300 flex items-center gap-1">← BACK</button>
+<button onClick={onBack} className="text-xs text-mil-fade hover:text-mil-red flex items-center gap-1">← BACK</button>
 
-  <div className="border border-yellow-400/40 bg-yellow-400/5 p-3">
+  <div className="border border-mil-red/40 bg-yellow-400/5 p-3">
     <div className="flex items-start justify-between mb-2">
       <div>
-        <div className="text-[10px] tracking-wider text-yellow-300">// CARD</div>
-        <div className="text-lg font-bold text-stone-100">{card?.name}</div>
-        <div className="text-[10px] tracking-wider text-stone-500 mt-0.5">{card?.id} · {card?.type}</div>
+        <div className="text-[10px] tracking-wider text-mil-red">// CARD</div>
+        <div className="text-lg font-bold text-mil-paper">{card?.name}</div>
+        <div className="text-[10px] tracking-wider text-mil-ghost mt-0.5">{card?.id} · {card?.type}</div>
       </div>
       <div className="text-right">
-        <div className="text-[10px] tracking-wider text-stone-500">SYNERGY</div>
-        <div className="text-2xl font-bold text-yellow-300">{score}</div>
+        <div className="text-[10px] tracking-wider text-mil-ghost">SYNERGY</div>
+        <div className="text-2xl font-bold text-mil-red">{score}</div>
       </div>
     </div>
     <div className="flex flex-wrap gap-1 mt-2">
       {keywords.map(k => (
-        <button key={k} onClick={() => onPickKeyword(k)} className="text-[10px] px-1.5 py-0.5 bg-yellow-400/10 border border-yellow-400/30 text-yellow-200 hover:bg-yellow-400/20">
+        <button key={k} onClick={() => onPickKeyword(k)} className="text-[10px] px-1.5 py-0.5 bg-mil-red/10 border border-mil-red/30 text-mil-paper hover:bg-mil-red/20">
           {k}
         </button>
       ))}
@@ -4164,14 +4164,14 @@ return (
   </div>
 
   {breakdown.length > 0 && (
-    <div className="border border-stone-800 bg-stone-900/40 p-3">
-      <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">SCORE BREAKDOWN</div>
+    <div className="border border-mil-border bg-mil-panel/60 p-3">
+      <div className="text-mil-red text-xs font-bold tracking-wider mb-2">SCORE BREAKDOWN</div>
       <div className="space-y-1 text-xs">
         {breakdown.map((b, i) => (
           <div key={i} className="flex items-center justify-between">
-            <span className="text-stone-300 truncate flex-1">
+            <span className="text-mil-stone truncate flex-1">
               {b.keyword || (b.pair && b.pair.join(' + '))}
-              {b.reason && <span className="text-stone-500 text-[10px] ml-1">({b.reason})</span>}
+              {b.reason && <span className="text-mil-ghost text-[10px] ml-1">({b.reason})</span>}
             </span>
             <span className={`font-bold ${b.points > 0 ? 'text-green-400' : 'text-rose-400'} ml-2`}>
               {b.points > 0 ? '+' : ''}{b.points}
@@ -4183,16 +4183,16 @@ return (
   )}
 
   {uniqueEdges.length > 0 && (
-    <div className="border border-stone-800 bg-stone-900/40 p-3">
-      <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">RULES INTERACTIONS</div>
+    <div className="border border-mil-border bg-mil-panel/60 p-3">
+      <div className="text-mil-red text-xs font-bold tracking-wider mb-2">RULES INTERACTIONS</div>
       <div className="space-y-1.5 text-xs">
         {uniqueEdges.map((e, i) => (
           <div key={i} className="flex items-center gap-2 flex-wrap">
-            <button onClick={() => onPickKeyword(e.from)} className="font-bold text-yellow-200 hover:text-yellow-300">{e.from}</button>
-            <span className={e.rel === 'counters' ? 'text-rose-400' : 'text-stone-500'}>
+            <button onClick={() => onPickKeyword(e.from)} className="font-bold text-mil-paper hover:text-mil-red">{e.from}</button>
+            <span className={e.rel === 'counters' ? 'text-rose-400' : 'text-mil-ghost'}>
               {e.rel === 'counters' ? '✕ counters' : '↔ refs'}
             </span>
-            <button onClick={() => onPickKeyword(e.to)} className="font-bold text-yellow-200 hover:text-yellow-300">{e.to}</button>
+            <button onClick={() => onPickKeyword(e.to)} className="font-bold text-mil-paper hover:text-mil-red">{e.to}</button>
           </div>
         ))}
       </div>
@@ -4200,18 +4200,18 @@ return (
   )}
 
   {partners.length > 0 && (
-    <div className="border border-stone-800 bg-stone-900/40 p-3">
-      <div className="text-yellow-300 text-xs font-bold tracking-wider mb-2">SYNERGY PARTNERS ({partners.length})</div>
+    <div className="border border-mil-border bg-mil-panel/60 p-3">
+      <div className="text-mil-red text-xs font-bold tracking-wider mb-2">SYNERGY PARTNERS ({partners.length})</div>
       <div className="space-y-1.5">
         {partners.slice(0, 12).map(p => (
           <div key={p.card.id} className="text-xs">
             <div className="flex items-center justify-between">
-              <span className="text-stone-200 truncate flex-1">{p.card.name}</span>
-              <span className="text-[10px] text-stone-500 ml-2">{p.shared.length} shared</span>
+              <span className="text-mil-stone truncate flex-1">{p.card.name}</span>
+              <span className="text-[10px] text-mil-ghost ml-2">{p.shared.length} shared</span>
             </div>
             <div className="flex flex-wrap gap-1 mt-0.5">
               {p.shared.map(k => (
-                <span key={k} className="text-[9px] px-1.5 py-0 bg-stone-800 border border-stone-700 text-stone-300">{k}</span>
+                <span key={k} className="text-[9px] px-1.5 py-0 bg-mil-muted border border-mil-green text-mil-stone">{k}</span>
               ))}
             </div>
           </div>

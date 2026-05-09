@@ -4,13 +4,13 @@
 
 html, body, #root {
   height: 100%;
-  background: #0a0a0c;
-  color: #f5f5f4;
+  background: #0d1a0f;
+  color: #e8dcc8;
 }
 
 body {
   margin: 0;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Oswald', Impact, sans-serif;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
 }
@@ -23,6 +23,11 @@ body {
   }
 }
 
+/* Monospace override for code/id elements */
+.font-mono, code, kbd {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -33,11 +38,24 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Slim native scrollbars in the dark theme */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: rgba(120,113,108,0.3); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(120,113,108,0.5); }
-::-webkit-scrollbar-track { background: transparent; }
+/* Scanline texture overlay for military CRT feel */
+@keyframes scanlines {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 4px; }
+}
 
-/* Tap target hint on mobile */
+/* Military scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #2d4a1e; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #3a6b27; }
+::-webkit-scrollbar-track { background: #080f0a; }
+
 button, [role="button"] { -webkit-tap-highlight-color: transparent; }
+
+/* Stencil-style heading utility */
+.stencil {
+  font-family: 'Oswald', Impact, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
