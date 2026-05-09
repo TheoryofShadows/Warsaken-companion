@@ -14,3 +14,30 @@ body {
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
 }
+
+/* Respect notches and home-indicator on iOS PWAs */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Slim native scrollbars in the dark theme */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(120,113,108,0.3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(120,113,108,0.5); }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Tap target hint on mobile */
+button, [role="button"] { -webkit-tap-highlight-color: transparent; }

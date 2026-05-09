@@ -1,0 +1,20 @@
+{
+  "name": "Warsaken Companion",
+  "short_name": "Warsaken",
+  "description": "Card browser, deck builder, AI deck composer, synergy graph, and live play HUD for the Warsaken TCG.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
+  "categories": ["games", "utilities"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

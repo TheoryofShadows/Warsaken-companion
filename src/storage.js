@@ -32,6 +32,7 @@ if (typeof window !== 'undefined' && !window.storage) {
   window.storage = {
     get: async (key) => safeGet(key),
     set: async (key, value) => safeSet(key, value),
+    delete: async (key) => safeRemove(key),
     remove: async (key) => safeRemove(key),
   };
 }
