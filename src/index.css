@@ -2,28 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
+html {
+  height: -webkit-fill-available; /* iOS Safari: prevents resize on keyboard open */
   height: 100%;
   background: #0d1a0f;
-  color: #e8dcc8;
 }
 
 body {
   margin: 0;
+  /* Use fill-available so the page fills the screen on iOS without overscrolling */
+  min-height: -webkit-fill-available;
+  min-height: 100vh;
+  background: #0d1a0f;
+  color: #e8dcc8;
   font-family: 'Oswald', Impact, sans-serif;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  /* Prevent iOS rubber-band on the body; tabs scroll independently */
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
 }
 
-/* Respect notches and home-indicator on iOS PWAs */
-@supports (padding: env(safe-area-inset-top)) {
-  body {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+#root {
+  height: 100%;
+  height: -webkit-fill-available;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* momentum scroll on iOS */
+  /* Push content above the home indicator */
+  padding-bottom: env(safe-area-inset-bottom);
+  /* Push content below the status bar when in standalone/PWA mode */
+  padding-top: env(safe-area-inset-top);
 }
 
-/* Monospace override for code/id elements */
+/* Monospace override */
 .font-mono, code, kbd {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
@@ -38,24 +50,27 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Scanline texture overlay for military CRT feel */
-@keyframes scanlines {
-  0%   { background-position: 0 0; }
-  100% { background-position: 0 4px; }
-}
-
-/* Military scrollbars */
+/* Military scrollbars (desktop) */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: #2d4a1e; border-radius: 0; }
 ::-webkit-scrollbar-thumb:hover { background: #3a6b27; }
 ::-webkit-scrollbar-track { background: #080f0a; }
 
-button, [role="button"] { -webkit-tap-highlight-color: transparent; }
+/* Remove tap flash on iOS for all interactive elements */
+button, [role="button"], a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* prevent 300ms delay on iOS */
+}
 
-/* Stencil-style heading utility */
+/* Stencil heading utility */
 .stencil {
   font-family: 'Oswald', Impact, sans-serif;
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
+}
+
+/* iOS: momentum scroll on any overflow-y-auto element */
+.overflow-y-auto, .overflow-y-scroll {
+  -webkit-overflow-scrolling: touch;
 }

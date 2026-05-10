@@ -1121,7 +1121,7 @@ const closeTeach = useCallback(() => { setTeachKeyword(null); setTeachCardId(nul
 
 return (
 <TeachContext.Provider value={{ showKeyword, showCard }}>
-<div className="min-h-screen text-mil-paper flex flex-col relative overflow-hidden" style={{ fontFamily: "'Oswald', Impact, sans-serif", background: '#0d1a0f' }}>
+<div className="text-mil-paper flex flex-col relative" style={{ fontFamily: "'Oswald', Impact, sans-serif", background: '#0d1a0f', minHeight: '100%' }}>
 {/* Layered backdrop: deep base + radial glow + subtle grid + vignette */}
 <div className="pointer-events-none fixed inset-0 z-0">
 <div className="absolute inset-0" style={{
@@ -1149,7 +1149,8 @@ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6)
     />
   )}
 
-  <div key={tab} className="relative z-10 flex-1 pb-16" style={{ animation: 'tabFadeIn 200ms ease-out' }}>
+  {/* Content area — padded enough to clear the nav bar + iOS home indicator */}
+  <div key={tab} className="relative z-10 flex-1" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))', animation: 'tabFadeIn 200ms ease-out' }}>
     {tab === 'browse' && <BrowseTab deck={activeDeck} setDeck={setActiveDeckCards} />}
     {tab === 'rules' && <RulesTab />}
     {tab === 'deck' && <DeckTab
@@ -1163,11 +1164,12 @@ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6)
     {tab === 'syn' && <SynergyTab />}
   </div>
 
-  {/* TAB BAR — glass surface with active glow */}
+  {/* TAB BAR — glass surface with active glow + iOS safe area at bottom */}
   <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-white/[0.06]" style={{
     background: 'linear-gradient(180deg, rgba(13,26,15,0.92) 0%, rgba(8,15,10,0.99) 100%)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
+    paddingBottom: 'env(safe-area-inset-bottom)',
   }}>
     <div className="grid grid-cols-5">
       <TabButton active={tab==='browse'} onClick={() => setTab('browse')} icon={Library} label="CARDS" sub={`${CARDS.length}`} />
@@ -1228,11 +1230,6 @@ function TeachPopover({ keyword, onClose }) {
 const k = findKeyword(keyword);
 const { showCard, showKeyword } = useTeach();
 
-useEffect(() => {
-document.body.style.overflow = 'hidden';
-return () => { document.body.style.overflow = ''; };
-}, []);
-
 // Find related keywords (referenced in rules text) and cards using this one
 const cardsUsing = useMemo(() => {
 if (!keyword) return [];
@@ -1253,7 +1250,7 @@ return { counters, refs };
 return (
 <div className="fixed inset-0 z-[60]" onClick={onClose}>
 <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} />
-<div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+<div className="absolute inset-x-0 bottom-0 max-h-[85vh]" style={{ overflowY: 'auto', WebkitOverflowScrolling: 'touch' }} onClick={(e) => e.stopPropagation()}>
 <div className="relative mx-auto max-w-md p-4 pb-24">
 <div className="relative rounded-2xl overflow-hidden border border-mil-red/30" style={{
 background: 'linear-gradient(180deg, rgba(13,26,15,0.96) 0%, rgba(8,15,10,0.99) 100%)',
@@ -1562,11 +1559,6 @@ const teach = useTeach();
 const [imgFailed, setImgFailed] = useState(false);
 const [imgLoaded, setImgLoaded] = useState(false);
 
-useEffect(() => {
-document.body.style.overflow = 'hidden';
-return () => { document.body.style.overflow = ''; };
-}, []);
-
 if (!card) return null;
 const meta = TYPE_META[card.type] || { Icon: Star, color: '#9ca3af', glow: 'rgba(255,255,255,0.1)' };
 const Icon = meta.Icon;
@@ -1574,7 +1566,7 @@ const rarMeta = RARITY_META[card.rarity] || { color: '#9ca3af', glow: 'rgba(0,0,
 const enriched = card.hasFullData ? card : null;
 
 return (
-<div className="fixed inset-0 z-50 overflow-y-auto" onClick={onClose}>
+<div className="fixed inset-0 z-50" style={{ overflowY: 'auto', WebkitOverflowScrolling: 'touch' }} onClick={onClose}>
 {/* Backdrop with card-art glow bleeding through */}
 <div className="absolute inset-0" style={{ background: 'rgba(5,5,7,0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }} />
 {card.img && !imgFailed && (
