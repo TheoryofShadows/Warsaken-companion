@@ -18,6 +18,27 @@ const ROOT = path.join(__dirname, '..');
 const set001 = JSON.parse(fs.readFileSync(path.join(__dirname, '001.v4.json'), 'utf8'));
 const set002 = JSON.parse(fs.readFileSync(path.join(__dirname, '002.json'), 'utf8'));
 
+// ── Build AtomicHub template ID lookup (Full Art preferred) ───────────────
+// templates.json.cards is { templateId: { setid, cardid, subset, ... } }
+const ATOMICHUB_BASE = 'https://atomichub.io/explorer/template/wax-mainnet/warsaken';
+const atomicHubById = {};
+try {
+  const tmpl = JSON.parse(fs.readFileSync(path.join(__dirname, 'templates.json'), 'utf8'));
+  const SUBSET_PRIORITY = ['Full Art', 'Full Art Medal', 'Base', 'Promo'];
+  for (const [templateId, t] of Object.entries(tmpl.cards || {})) {
+    const cardKey = `${t.setid}-${String(t.cardid).padStart(3, '0')}`;
+    const existing = atomicHubById[cardKey];
+    const newRank = SUBSET_PRIORITY.indexOf(t.subset);
+    const oldRank = existing ? SUBSET_PRIORITY.indexOf(existing.subset) : 999;
+    if (!existing || (newRank !== -1 && (oldRank === -1 || newRank < oldRank))) {
+      atomicHubById[cardKey] = { templateId, subset: t.subset };
+    }
+  }
+  console.log(`Loaded AtomicHub template IDs for ${Object.keys(atomicHubById).length} cards.`);
+} catch {
+  console.warn('templates.json not found — AtomicHub links will be omitted.');
+}
+
 // ── Attribute/keyword definitions (from warsaken.cards/attributes.json) ───
 // We embed a subset mapping keyword function names → display text.
 // The full attributes.json is fetched once and baked in here.
@@ -230,6 +251,11 @@ function transform(setPrefix, cardIndex, card) {
 
   if (produces && produces.length > 0) {
     record.produces = produces;
+  }
+
+  const hub = atomicHubById[id];
+  if (hub) {
+    record.atomicHubUrl = `${ATOMICHUB_BASE}/${hub.templateId}`;
   }
 
   return record;

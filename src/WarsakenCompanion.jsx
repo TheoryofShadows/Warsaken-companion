@@ -1176,8 +1176,12 @@ background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6)
       <TabButton active={tab==='ai'} onClick={() => setTab('ai')} icon={Sparkles} label="AI" sub="builder" />
       <TabButton active={tab==='syn'} onClick={() => setTab('syn')} icon={Network} label="SYN" sub="combos" />
     </div>
-    <div className="text-center text-[9px] text-stone-700 pb-1 tracking-wider">
-      Warsaken® · Eclectic Nerds LLC · Fan companion by TheoryofShadows
+    <div className="flex items-center justify-center gap-3 pb-1 pt-0.5">
+      <span className="text-[9px] text-stone-700 tracking-wider">Warsaken® · Eclectic Nerds LLC · Fan app</span>
+      <a href="https://discord.gg/warsaken" target="_blank" rel="noopener noreferrer"
+        className="text-[9px] text-indigo-400/60 hover:text-indigo-400 tracking-wider transition">
+        Join Discord ↗
+      </a>
     </div>
   </nav>
 
@@ -1358,6 +1362,9 @@ const [query, setQuery] = useState('');
 const [filterType, setFilterType] = useState('All');
 const [filterSet, setFilterSet] = useState('All');
 const [filterRarity, setFilterRarity] = useState('All');
+const [bannerDismissed, setBannerDismissed] = useState(() => {
+  try { return !!localStorage.getItem('wsk_banner_v1'); } catch { return false; }
+});
 const [showFilters, setShowFilters] = useState(false);
 const [selectedCard, setSelectedCard] = useState(null);
 
@@ -1442,6 +1449,24 @@ style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.08
 </header>
 
   <main className="px-4 py-4">
+    {!bannerDismissed && (
+      <div className="mb-4 rounded-xl border border-indigo-500/25 p-4 relative" style={{ background: 'rgba(99,102,241,0.07)' }}>
+        <button onClick={() => { setBannerDismissed(true); try { localStorage.setItem('wsk_banner_v1','1'); } catch {} }}
+          className="absolute top-2 right-2 text-mil-ghost hover:text-white transition"><X className="h-4 w-4" /></button>
+        <div className="text-[11px] font-bold tracking-widest text-indigo-300 mb-1.5">WELCOME TO WARSAKEN COMPANION</div>
+        <p className="text-xs text-mil-stone leading-relaxed mb-2">
+          Warsaken® is a <span className="text-mil-paper font-bold">physical trading card game</span> — build a real deck and play at your table. Cards are also collectible digital NFTs on the WAX blockchain. Tap any card to see its stats, abilities, and where to buy it.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <a href="https://www.warsaken.com" target="_blank" rel="noopener noreferrer"
+            className="text-[11px] px-2.5 py-1 rounded-md border border-indigo-500/30 text-indigo-300 hover:border-indigo-400 transition">Official Site ↗</a>
+          <a href="https://discord.gg/warsaken" target="_blank" rel="noopener noreferrer"
+            className="text-[11px] px-2.5 py-1 rounded-md border border-indigo-500/30 text-indigo-300 hover:border-indigo-400 transition">Discord ↗</a>
+          <a href="https://rules.warsaken.com" target="_blank" rel="noopener noreferrer"
+            className="text-[11px] px-2.5 py-1 rounded-md border border-indigo-500/30 text-indigo-300 hover:border-indigo-400 transition">Learn to Play ↗</a>
+        </div>
+      </div>
+    )}
     {filtered.length === 0 ? (
       <div className="py-20 text-center"><Skull className="h-8 w-8 mx-auto text-stone-700 mb-3" /><p className="text-sm text-mil-fade">no cards match.</p></div>
     ) : (
@@ -1508,7 +1533,10 @@ boxShadow: inDeck ? `0 0 24px ${meta.glow.replace(/[\d.]+\)/, '0.15)')}, inset 0
         <span className="text-[10px] tracking-wider truncate" style={{ color: rarMeta.color }}>{card.rarity}</span>
       </div>
       <div className="text-sm text-stone-50 truncate font-medium leading-tight">{card.name}</div>
-      <div className="text-[10px] text-mil-ghost mt-0.5 font-mono">{card.id}</div>
+      <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+        <span className="text-[10px] text-mil-ghost font-mono flex-shrink-0">{card.id}</span>
+        {(() => { const e = ENRICHED_BY_ID[card.id]; const sub = e?.subtype; const kws = e?.keywords?.slice(0,2); return (sub || kws?.length) ? <><span className="text-stone-700 text-[9px]">·</span><span className="text-[10px] text-mil-fade truncate">{sub || kws.join(', ')}</span></> : null; })()}
+      </div>
     </div>
 
     {/* Counter controls */}
@@ -1683,16 +1711,23 @@ filter: 'blur(40px) saturate(1.4)',
           </button>
         </div>
 
-        <div className="text-[10px] text-mil-ghost tracking-wider pt-2 border-t border-white/5">
+        <div className="text-[10px] text-mil-ghost tracking-wider pt-2 border-t border-white/5 space-y-1">
           <div className="flex justify-between"><span>SET</span><span className="text-mil-stone">{card.setid} · {SET_NAMES[card.setid] || ''}</span></div>
-          <div className="flex justify-between mt-1"><span>RARITY</span><span style={{ color: rarMeta.color }}>{card.rarity}</span></div>
-          {!enriched && (
-            <div className="mt-2 text-yellow-500/70 text-[10px]">// Card data not yet enriched — run warsaken_enrich.py to populate.</div>
+          <div className="flex justify-between"><span>RARITY</span><span style={{ color: rarMeta.color }}>{card.rarity}</span></div>
+          {enriched?.artist && <div className="flex justify-between"><span>ARTIST</span><span className="text-mil-stone">{enriched.artist}</span></div>}
+        </div>
+        <div className="flex gap-2 pt-1">
+          <a href={card.url} target="_blank" rel="noopener noreferrer"
+            className="flex-1 text-center px-3 py-2.5 rounded-md border border-white/10 text-mil-fade hover:border-mil-red hover:text-mil-red transition text-xs tracking-wider">
+            <ExternalLink className="h-3 w-3 inline mr-1" />WARSAKEN.CARDS
+          </a>
+          {enriched?.atomicHubUrl && (
+            <a href={enriched.atomicHubUrl} target="_blank" rel="noopener noreferrer"
+              className="flex-1 text-center px-3 py-2.5 rounded-md border border-white/10 text-mil-fade hover:border-indigo-400 hover:text-indigo-400 transition text-xs tracking-wider">
+              <ExternalLink className="h-3 w-3 inline mr-1" />ATOMICHUB
+            </a>
           )}
         </div>
-        <a href={card.url} target="_blank" rel="noopener noreferrer" className="block text-center px-3 py-2 rounded-md border border-white/10 text-mil-fade hover:border-mil-red hover:text-mil-red transition text-xs tracking-wider">
-          <ExternalLink className="h-3 w-3 inline mr-1.5" />VIEW ON WARSAKEN
-        </a>
       </div>
     </div>
   </div>
@@ -1976,22 +2011,40 @@ const links = [
 ];
 return (
 <div className="space-y-4">
+  {/* Discord CTA — most important community action */}
+  <a href="https://discord.gg/warsaken" target="_blank" rel="noopener noreferrer"
+    className="flex items-center gap-3 p-4 rounded-xl border border-indigo-500/40 hover:border-indigo-400 transition group"
+    style={{ background: 'rgba(99,102,241,0.08)' }}>
+    <div className="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(99,102,241,0.2)' }}>
+      <span className="text-lg">💬</span>
+    </div>
+    <div className="min-w-0">
+      <div className="text-sm font-bold text-indigo-300 group-hover:text-indigo-200 transition">Join the Warsaken Discord</div>
+      <div className="text-xs text-mil-fade mt-0.5">Find players, get deck advice, follow new releases</div>
+    </div>
+    <ExternalLink className="h-4 w-4 text-indigo-400/50 flex-shrink-0 ml-auto" />
+  </a>
+
   <div className="border border-mil-red/30 bg-mil-red/5 p-4">
     <div className="text-[10px] tracking-[0.2em] text-mil-red/80 mb-2">// WARSAKEN®</div>
     <div className="text-sm font-bold text-mil-paper mb-3">Created by Brandon Adams · Eclectic Nerds LLC</div>
     <div className="text-xs text-mil-stone leading-relaxed space-y-2">
       <p>
-        Warsaken® is a modern military-themed deck construction card game designed by Brandon Adams, who first conceived it at age 17 as a way to connect with his father — a US Army veteran. After revisiting the idea in 2018, he founded <span className="text-mil-red">Eclectic Nerds LLC</span> and launched Warsaken commercially in 2021.
+        Warsaken® is a <span className="text-mil-paper font-bold">physical trading card game</span> — you build real decks and play at your table with friends. It's a modern military-themed deck-construction game designed by Brandon Adams, who first conceived it at age 17 to connect with his father, a US Army veteran.
       </p>
       <p>
-        The game features artists from around the world and is published physically and digitally on the WAX blockchain.
+        After revisiting the idea in 2018, he founded <span className="text-mil-red">Eclectic Nerds LLC</span> and launched Warsaken commercially in 2021. Cards feature artists from around the world and are available both as physical cards and as digital collectibles on the WAX blockchain.
       </p>
+      <a href="https://www.warsaken.com" target="_blank" rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 mt-2 text-xs text-mil-red hover:text-mil-paper transition">
+        <ExternalLink className="h-3 w-3" />Get the game at warsaken.com
+      </a>
     </div>
   </div>
 
   <div className="border border-mil-border bg-mil-panel/60 p-4">
     <div className="text-mil-red text-xs font-bold tracking-wider mb-3">OFFICIAL LINKS</div>
-    <div className="space-y-2">
+    <div className="space-y-1">
       {links.map(l => (
         <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer"
           className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-mil-muted/30 transition group">
@@ -2006,13 +2059,13 @@ return (
     <div className="text-mil-red text-xs font-bold tracking-wider mb-2">ABOUT THIS COMPANION</div>
     <div className="text-xs text-mil-stone leading-relaxed space-y-2">
       <p>
-        This is an <span className="text-mil-red font-bold">unofficial, fan-made companion app</span> built by <span className="text-mil-red">TheoryofShadows</span> to help players learn Warsaken faster and build better decks.
+        This is an <span className="text-mil-red font-bold">unofficial, fan-made companion app</span> built by <span className="text-mil-red">TheoryofShadows</span> to help players browse cards, build decks, and learn the game faster.
       </p>
       <p>
-        It is not affiliated with or endorsed by Eclectic Nerds LLC or EN Digital LLC. All card names, artwork, rules text, game terms, and the Warsaken® trademark are property of <span className="text-mil-red">Eclectic Nerds LLC</span>.
+        Not affiliated with or endorsed by Eclectic Nerds LLC. All card names, artwork, rules text, and the Warsaken® trademark are property of <span className="text-mil-red">Eclectic Nerds LLC</span>.
       </p>
       <p>
-        Card data is sourced from the WAX blockchain (AtomicAssets, collection: <span className="font-mono text-mil-fade">warsaken</span>) and official rules from <span className="font-mono text-mil-fade">rules.warsaken.com</span>. Deck recipes are authored by the Warsaken game creators and sourced from <span className="font-mono text-mil-fade">rules.warsaken.com/decks</span>.
+        Card data sourced from warsaken.cards. Deck recipes authored by the Warsaken creators at rules.warsaken.com/decks.
       </p>
     </div>
   </div>
@@ -2020,10 +2073,10 @@ return (
   <div className="border border-mil-border bg-mil-panel/60 p-4">
     <div className="text-mil-red text-xs font-bold tracking-wider mb-2">HOW THE AI BUILDERS WORK</div>
     <div className="text-xs text-mil-stone leading-relaxed space-y-2">
-      <p><span className="text-mil-paper font-bold">RECIPE</span> — Loads official deck templates authored by the Warsaken creators from rules.warsaken.com. Cards are resolved from the enriched card pool using type and subtype matching as a fallback when exact IDs aren't available.</p>
-      <p><span className="text-mil-paper font-bold">NOVEL</span> — Builds an original deck from scratch. Reads your chosen leader's abilities to detect themes, then scores every card in the enriched pool using keyword synergy, cost curve, stat efficiency, and leader-text affinity. Every card pick shows its reasoning.</p>
-      <p><span className="text-mil-paper font-bold">COUNTER-META</span> — Adversarial builder. Predicts the target leader's likely deck by aggregating their official recipes plus a novel composition, then builds your deck to specifically counter it using keyword counter-edges, force-type denial (ANTI-AIR / ANTI-GROUND / ANTI-NAVAL), and archetype disruption.</p>
-      <p className="text-mil-ghost">All three builders run entirely in your browser — no server, no API key required. The card pool currently has <span className="text-mil-fade">{ENRICHED.length} cards with full OCR data</span> out of {CARDS.length} total — only leaders in the enriched set are available for Novel and Counter modes. Recipe mode works for all {CARDS.length} cards.</p>
+      <p><span className="text-mil-paper font-bold">RECIPE</span> — Official deck templates from rules.warsaken.com, authored by the Warsaken creators. Cards are resolved from the full {CARDS.length}-card pool using type and subtype matching.</p>
+      <p><span className="text-mil-paper font-bold">NOVEL</span> — Builds an original deck from scratch. Reads your leader's abilities to detect themes, then scores every card using keyword synergy, cost curve, and stat efficiency. Every pick shows its reasoning.</p>
+      <p><span className="text-mil-paper font-bold">COUNTER-META</span> — Pick the leader you expect to face; the engine builds a deck designed to beat them using keyword counter-edges, force-type denial, and archetype disruption.</p>
+      <p className="text-mil-ghost">All three builders run entirely in your browser — no server, no API key required.</p>
     </div>
   </div>
 
