@@ -3,36 +3,45 @@
 @tailwind utilities;
 
 html {
-  height: -webkit-fill-available; /* iOS Safari: prevents resize on keyboard open */
   height: 100%;
   background: #0d1a0f;
 }
 
 body {
   margin: 0;
-  /* Use fill-available so the page fills the screen on iOS without overscrolling */
-  min-height: -webkit-fill-available;
-  min-height: 100vh;
+  height: 100%;
   background: #0d1a0f;
   color: #e8dcc8;
   font-family: 'Oswald', Impact, sans-serif;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
-  /* Prevent iOS rubber-band on the body; tabs scroll independently */
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
 }
 
 #root {
-  height: 100%;
-  height: -webkit-fill-available;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* momentum scroll on iOS */
-  /* Push content above the home indicator */
-  padding-bottom: env(safe-area-inset-bottom);
-  /* Push content below the status bar when in standalone/PWA mode */
-  padding-top: env(safe-area-inset-top);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* iOS PWA: lock body, scroll #root — prevents rubber-band on the chrome */
+@supports (-webkit-touch-callout: none) {
+  html { height: -webkit-fill-available; }
+  body {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    min-height: -webkit-fill-available;
+  }
+  #root {
+    height: 100%;
+    height: -webkit-fill-available;
+    min-height: unset;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
+  }
 }
 
 /* Monospace override */
