@@ -1364,6 +1364,7 @@ const [bannerDismissed, setBannerDismissed] = useState(() => {
 });
 const [showFilters, setShowFilters] = useState(false);
 const [selectedCard, setSelectedCard] = useState(null);
+const [visibleCount, setVisibleCount] = useState(100);
 
 const types = useMemo(() => ['All', ...[...new Set(CARDS.map(c => c.type))].sort()], []);
 const sets = useMemo(() => ['All', ...[...new Set(CARDS.map(c => c.setid))].sort()], []);
@@ -1393,7 +1394,10 @@ return hay.toLowerCase().includes(q);
 }, [query, filterType, filterSet, filterRarity]);
 
 const activeFilterCount = (filterType !== 'All' ? 1 : 0) + (filterSet !== 'All' ? 1 : 0) + (filterRarity !== 'All' ? 1 : 0);
-const clearFilters = () => { setFilterType('All'); setFilterSet('All'); setFilterRarity('All'); };
+const clearFilters = () => { setFilterType('All'); setFilterSet('All'); setFilterRarity('All'); setVisibleCount(100); };
+
+// Reset visible count whenever the filtered set changes
+useEffect(() => { setVisibleCount(100); }, [filtered]);
 
 const addToDeck = (id) => setDeck(d => ({ ...d, [id]: (d[id] || 0) + 1 }));
 const removeFromDeck = (id) => setDeck(d => {
@@ -1468,13 +1472,18 @@ style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.08
       <div className="py-20 text-center"><Skull className="h-8 w-8 mx-auto text-stone-700 mb-3" /><p className="text-sm text-mil-fade">no cards match.</p></div>
     ) : (
       <div className="space-y-2">
-        {filtered.slice(0, 100).map(card => (
+        {filtered.slice(0, visibleCount).map(card => (
           <CardRow key={card.id} card={card} count={deck[card.id] || 0}
             onClick={() => setSelectedCard(card)}
             onAdd={() => addToDeck(card.id)}
             onRemove={() => removeFromDeck(card.id)} />
         ))}
-        {filtered.length > 100 && (<div className="py-4 text-center text-xs text-mil-ghost tracking-wider border border-dashed border-mil-border">SHOWING 100 / {filtered.length} · REFINE FILTERS</div>)}
+        {filtered.length > visibleCount && (
+          <button onClick={() => setVisibleCount(n => n + 100)}
+            className="w-full py-3 text-xs tracking-wider text-mil-fade hover:text-mil-paper border border-dashed border-mil-border hover:border-white/20 transition">
+            LOAD MORE · SHOWING {visibleCount} / {filtered.length}
+          </button>
+        )}
       </div>
     )}
   </main>
@@ -2162,13 +2171,16 @@ if (!card) { unknown++; continue; }
 next[id] = (next[id] || 0) + qty;
 }
 if (Object.keys(next).length === 0) {
-setImportError('No valid cards found. Format: "1x 001-000 Card Name" per line.');
+const parseable = lines.filter(l => l.match(/^(\d+)x?\s+([\w-]+)/)).length;
+setImportError(parseable > 0
+  ? `${unknown} card ID(s) not recognised. Check IDs match the format 001-000.`
+  : 'No parseable lines found. Format: "1x 001-000 Card Name" per line.');
 return;
 }
 const id = createDeck(importedName, next);
 setShowImport(false);
 setImportText('');
-if (unknown > 0) alert(`Imported with ${unknown} unknown card(s) skipped.`);
+if (unknown > 0) onShareToast?.(`Imported ${Object.keys(next).length} card(s) · ${unknown} unknown ID(s) skipped`);
 };
 
 const handleRename = () => {
@@ -2462,8 +2474,14 @@ boxShadow: `0 8px 32px -8px ${archMeta.color}33`,
       </div>
       <div className="space-y-2">
         {[0, 1, 2, 3, 4].map(c => {
-          const n = analysis.costCurve[c] || 0;
-          const cMax = Math.max(...Object.values(analysis.costCurve), 1);
+          const n = c === 4
+            ? Object.entries(analysis.costCurve).filter(([k]) => parseInt(k) >= 4).reduce((s, [, v]) => s + v, 0)
+            : analysis.costCurve[c] || 0;
+          const cMax = Math.max(
+            ...[0,1,2,3].map(k => analysis.costCurve[k] || 0),
+            Object.entries(analysis.costCurve).filter(([k]) => parseInt(k) >= 4).reduce((s,[,v]) => s+v, 0),
+            1
+          );
           return (
             <div key={c}>
               <div className="flex justify-between text-[11px] mb-1">
@@ -2630,8 +2648,8 @@ if (validation.total < 10) {
 return (
 <div className="rounded-xl p-6 text-center" style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.06)' }}>
 <Activity className="h-10 w-10 mx-auto text-stone-700 mb-3" />
-<p className="text-sm text-mil-fade">Practice mode needs at least 10 cards in deck.</p>
-<p className="text-xs text-mil-ghost/70 mt-1 tracking-wider">CURRENTLY {validation.total}</p>
+<p className="text-sm text-mil-fade">Practice mode needs at least 10 cards in your deck.</p>
+<p className="text-xs text-mil-ghost/70 mt-1">Add more cards in the Browse tab — currently {validation.total}.</p>
 </div>
 );
 }
@@ -3643,7 +3661,14 @@ return (
       </div>
       <div className="grid grid-cols-3 gap-2 mt-4">
         <StatBox label="CARDS" value={`${result.totalCards}/65`} color="#cc2200" />
-        <StatBox label="COVERAGE" value={`${Math.round(result.coveragePct * 100)}%`} color={result.coveragePct >= 0.5 ? '#86efac' : result.coveragePct >= 0.25 ? '#cc2200' : '#fb7185'} />
+        <div className="rounded-lg p-2.5 text-center relative overflow-hidden" style={{
+          background: `linear-gradient(180deg, ${result.coveragePct >= 0.5 ? '#86efac' : result.coveragePct >= 0.25 ? '#cc2200' : '#fb7185'}15 0%, rgba(0,0,0,0.65) 100%)`,
+          border: `1px solid ${result.coveragePct >= 0.5 ? '#86efac' : result.coveragePct >= 0.25 ? '#cc2200' : '#fb7185'}30`,
+        }}>
+          <div className="text-[9px] tracking-[0.15em] text-mil-fade mb-0.5">COVERAGE</div>
+          <div className="text-lg font-bold leading-tight" style={{ color: result.coveragePct >= 0.5 ? '#86efac' : result.coveragePct >= 0.25 ? '#cc2200' : '#fb7185' }}>{Math.round(result.coveragePct * 100)}%</div>
+          <div className="text-[8px] text-mil-ghost mt-0.5">of enemy keywords countered</div>
+        </div>
         <StatBox label="THREATS" value={`${result.coveredThreats}/${result.totalThreats}`} color="#7dd3fc" />
       </div>
     </div>
@@ -3749,13 +3774,16 @@ return (
         <div className="text-xs font-bold text-mil-paper tracking-wider">COST CURVE</div>
       </div>
       <div className="space-y-2">
-        {[0, 1, 2, 3].map(c => {
-          const n = result.costCurve[c] || 0;
-          const max = Math.max(...Object.values(result.costCurve), 1);
+        {[0, 1, 2, 3, 4].map(c => {
+          const n = c === 4
+            ? Object.entries(result.costCurve).filter(([k]) => parseInt(k) >= 4).reduce((s, [, v]) => s + v, 0)
+            : result.costCurve[c] || 0;
+          const max = Math.max(...[0,1,2,3].map(k => result.costCurve[k]||0),
+            Object.entries(result.costCurve).filter(([k])=>parseInt(k)>=4).reduce((s,[,v])=>s+v,0), 1);
           return (
             <div key={c}>
               <div className="flex justify-between text-[11px] mb-1">
-                <span className="text-mil-stone font-mono">↺ {c}</span>
+                <span className="text-mil-stone font-mono">↺ {c}{c === 4 ? '+' : ''}</span>
                 <span className="text-mil-fade">{n} cards</span>
               </div>
               <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.65)' }}>
