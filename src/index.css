@@ -2,25 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
+html {
   height: 100%;
-  background: #0a0a0c;
-  color: #f5f5f4;
+  background: #0d1a0f;
 }
 
 body {
   margin: 0;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  height: 100%;
+  background: #0d1a0f;
+  color: #e8dcc8;
+  font-family: 'Oswald', Impact, sans-serif;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
 }
 
-/* Respect notches and home-indicator on iOS PWAs */
-@supports (padding: env(safe-area-inset-top)) {
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* iOS PWA: lock body, scroll #root — prevents rubber-band on the chrome */
+@supports (-webkit-touch-callout: none) {
+  html { height: -webkit-fill-available; }
   body {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    min-height: -webkit-fill-available;
   }
+  #root {
+    height: 100%;
+    height: -webkit-fill-available;
+    min-height: unset;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Monospace override */
+.font-mono, code, kbd {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 @keyframes fadeIn {
@@ -33,11 +59,27 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Slim native scrollbars in the dark theme */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: rgba(120,113,108,0.3); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(120,113,108,0.5); }
-::-webkit-scrollbar-track { background: transparent; }
+/* Military scrollbars (desktop) */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #2d4a1e; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #3a6b27; }
+::-webkit-scrollbar-track { background: #080f0a; }
 
-/* Tap target hint on mobile */
-button, [role="button"] { -webkit-tap-highlight-color: transparent; }
+/* Remove tap flash on iOS for all interactive elements */
+button, [role="button"], a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* prevent 300ms delay on iOS */
+}
+
+/* Stencil heading utility */
+.stencil {
+  font-family: 'Oswald', Impact, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* iOS: momentum scroll on any overflow-y-auto element */
+.overflow-y-auto, .overflow-y-scroll {
+  -webkit-overflow-scrolling: touch;
+}

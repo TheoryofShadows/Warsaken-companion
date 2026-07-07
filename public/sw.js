@@ -3,8 +3,16 @@
 // - Cache-first for static assets
 // - Bypasses non-GET and cross-origin entirely
 
-const VERSION = 'wsk-v1';
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg', '/favicon.svg'];
+const VERSION = 'wsk-v2';
+// BASE is injected at build time via vite; falls back to '/' for local dev.
+const BASE = self.location.pathname.replace(/\/sw\.js$/, '') || '';
+const SHELL = [
+  BASE + '/',
+  BASE + '/index.html',
+  BASE + '/manifest.webmanifest',
+  BASE + '/icon.svg',
+  BASE + '/favicon.svg',
+];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).catch(() => {}));
@@ -31,10 +39,12 @@ self.addEventListener('fetch', (e) => {
       fetch(request)
         .then((res) => {
           const copy = res.clone();
-          caches.open(VERSION).then((c) => c.put('/', copy)).catch(() => {});
+          caches.open(VERSION).then((c) => c.put(BASE + '/', copy)).catch(() => {});
           return res;
         })
-        .catch(() => caches.match('/').then((r) => r || caches.match('/index.html')))
+        .catch(() =>
+          caches.match(BASE + '/').then((r) => r || caches.match(BASE + '/index.html'))
+        )
     );
     return;
   }

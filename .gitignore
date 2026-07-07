@@ -5,5 +5,10 @@ dist
 .vite
 .env
 .env.local
-images/
-ocr_log.jsonl
+
+# Scripts: cached images and intermediate OCR/build artifacts
+scripts/images/
+scripts/enriched.json
+scripts/enrich_log.txt
+scripts/ocr_log.jsonl
+scripts/templates.json

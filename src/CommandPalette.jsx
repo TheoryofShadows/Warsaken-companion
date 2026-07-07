@@ -13,10 +13,8 @@ export default function CommandPalette({ open, onClose, cards, onPick }) {
     if (open) {
       setQ('');
       setIdx(0);
-      document.body.style.overflow = 'hidden';
       setTimeout(() => inputRef.current?.focus(), 10);
     }
-    return () => { document.body.style.overflow = ''; };
   }, [open]);
 
   const results = useMemo(() => {
